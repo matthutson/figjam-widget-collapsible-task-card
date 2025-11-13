@@ -274,7 +274,7 @@ function CollapsibleTaskCard() {
                 width={27}
                 height={27}
                 fill={status.state ? status.color : "#FFFFFF"}
-                stroke="#CCCCCC"
+                stroke="#333333"
                 strokeWidth={1.5}
                 cornerRadius={3}
                 horizontalAlignItems="center"
