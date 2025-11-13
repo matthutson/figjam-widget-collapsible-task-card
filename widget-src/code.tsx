@@ -11,8 +11,8 @@ const {
   usePropertyMenu,
 } = widget;
 
-const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3"];
-const colorNames: string[] = ["Coral", "Blue", "Green", "Yellow"];
+const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3", "#FFFFFF", "#E8E8E8"];
+const colorNames: string[] = ["Coral", "Blue", "Green", "Yellow", "White", "Light Grey"];
 
 const initialRows: { rowKey: string; text: string; color?: string }[] = [
   { rowKey: "row1", text: "", color: colors[0] },
@@ -65,6 +65,26 @@ function CollapsibleTaskCard() {
     rowColors.delete(rowKey);
   };
 
+  // Move row up
+  const moveRowUp = (rowKey: string) => {
+    const index = rowKeys.indexOf(rowKey);
+    if (index > 0) {
+      const newKeys = [...rowKeys];
+      [newKeys[index - 1], newKeys[index]] = [newKeys[index], newKeys[index - 1]];
+      setRowKeys(newKeys);
+    }
+  };
+
+  // Move row down
+  const moveRowDown = (rowKey: string) => {
+    const index = rowKeys.indexOf(rowKey);
+    if (index < rowKeys.length - 1) {
+      const newKeys = [...rowKeys];
+      [newKeys[index], newKeys[index + 1]] = [newKeys[index + 1], newKeys[index]];
+      setRowKeys(newKeys);
+    }
+  };
+
   // Initialize widget with default rows
   useEffect(() => {
     if (initialized) return;
@@ -96,13 +116,13 @@ function CollapsibleTaskCard() {
       },
       {
         itemType: "color-selector",
-        tooltip: "Row Color (for selected rows)",
+        tooltip: "Row Color (select a row first)",
         propertyName: "rowColor",
         options: colors.map((color, index) => ({
           tooltip: colorNames[index],
           option: color
         })),
-        selectedOption: colors[0],
+        selectedOption: selectedRowKey ? (rowColors.get(selectedRowKey) ?? colors[0]) : colors[0],
       },
     ],
     ({ propertyName, propertyValue }) => {
@@ -375,10 +395,12 @@ function CollapsibleTaskCard() {
           spacing={4}
         >
 
-          {rowKeys.map((rowKey) => {
+          {rowKeys.map((rowKey, index) => {
             const rowContent = rows.get(rowKey) ?? "";
             const rowColor = rowColors.get(rowKey) ?? colors[0];
             const isSelected = selectedRowKey === rowKey;
+            const isFirst = index === 0;
+            const isLast = index === rowKeys.length - 1;
 
             return (
               <AutoLayout
@@ -392,13 +414,27 @@ function CollapsibleTaskCard() {
                 cornerRadius={8}
                 padding={2}
               >
-                {/* Color indicator */}
-                <Rectangle
-                  width={8}
-                  height={8}
-                  fill={rowColor}
-                  cornerRadius={4}
-                />
+                {/* Reorder controls */}
+                <AutoLayout
+                  direction="vertical"
+                  spacing={2}
+                  padding={4}
+                >
+                  <SVG
+                    src={`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L6 3M6 3L3 6M6 3L9 6" stroke="${isFirst ? '#CCCCCC' : '#666666'}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isFirst ? 0.3 : 0.6}
+                    hoverStyle={{ opacity: isFirst ? 0.3 : 1 }}
+                    onClick={() => !isFirst && moveRowUp(rowKey)}
+                    tooltip={isFirst ? "" : "Move up"}
+                  />
+                  <SVG
+                    src={`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 3L6 9M6 9L9 6M6 9L3 6" stroke="${isLast ? '#CCCCCC' : '#666666'}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isLast ? 0.3 : 0.6}
+                    hoverStyle={{ opacity: isLast ? 0.3 : 1 }}
+                    onClick={() => !isLast && moveRowDown(rowKey)}
+                    tooltip={isLast ? "" : "Move down"}
+                  />
+                </AutoLayout>
 
                 {/* Row content */}
                 <AutoLayout
@@ -407,7 +443,7 @@ function CollapsibleTaskCard() {
                 >
                   <Input
                     value={rowContent}
-                    placeholder="Add text..."
+                    placeholder=""
                     onTextEditEnd={(e) => rows.set(rowKey, e.characters)}
                     inputBehavior="multiline"
                     width={"fill-parent"}
@@ -415,11 +451,12 @@ function CollapsibleTaskCard() {
                     fontFamily="Roboto Mono"
                     inputFrameProps={{
                       fill: rowColor,
-                      stroke: "#CCCCCC",
-                      strokeWidth: 1,
+                      stroke: isSelected ? "#333333" : "#CCCCCC",
+                      strokeWidth: isSelected ? 2 : 1,
                       padding: { horizontal: 14, vertical: 10 },
                       cornerRadius: 8,
                       width: "fill-parent",
+                      height: rowContent ? "hug-contents" : 60,
                     }}
                   />
                 </AutoLayout>
