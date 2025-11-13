@@ -163,6 +163,7 @@ function CollapsibleTaskCard() {
 
         <AutoLayout
           direction="horizontal"
+          width="hug-contents"
           spacing={12}
           padding={{ top: 4, right: 8 }}
         >
@@ -183,6 +184,7 @@ function CollapsibleTaskCard() {
           ].map((status) => (
             <AutoLayout
               direction="vertical"
+              width="hug-contents"
               spacing={6}
               horizontalAlignItems="center"
             >
@@ -289,6 +291,7 @@ function CollapsibleTaskCard() {
             >
               {/* 행 헤더 */}
               <AutoLayout
+                width="hug-contents"
                 height={"fill-parent"}
                 fill="#FFFFFF"
                 verticalAlignItems="center"
@@ -330,6 +333,7 @@ function CollapsibleTaskCard() {
                 />
                 {/* 행 삭제 버튼 */}
                 <AutoLayout
+                  width="hug-contents"
                   height={"fill-parent"}
                   fill={"#FFFFFF"}
                   padding={{ top: 12, right: 8 }}
