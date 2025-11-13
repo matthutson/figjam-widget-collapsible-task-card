@@ -15,7 +15,7 @@ const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3", "#FFFFFF",
 const colorNames: string[] = ["Coral", "Blue", "Green", "Yellow", "White", "Light Grey"];
 
 const initialRows: { rowKey: string; text: string; color?: string }[] = [
-  { rowKey: "row1", text: "", color: colors[0] },
+  { rowKey: "row1", text: "", color: colors[5] },
 ];
 
 function CollapsibleTaskCard() {
@@ -39,7 +39,7 @@ function CollapsibleTaskCard() {
     "rowsNum",
     initialRows.map((header) => header.rowKey)
   );
-  const [color, setColor] = useSyncedState("color", colors[2]);
+  const [color, setColor] = useSyncedState("color", colors[4]);
   const [selectedRowKey, setSelectedRowKey] = useSyncedState<string | null>("selectedRowKey", null);
   const rows = useSyncedMap<string>("rows");
   const rowColors = useSyncedMap<string>("rowColors");
@@ -54,7 +54,7 @@ function CollapsibleTaskCard() {
       addRow();
     } else {
       setRowKeys([...rowKeys, newKey]);
-      rowColors.set(newKey, colors[0]);
+      rowColors.set(newKey, colors[5]);
     }
   };
 
@@ -105,45 +105,13 @@ function CollapsibleTaskCard() {
     setLastUpdated(new Date().toLocaleDateString());
   };
 
-  // Export to Jira
-  const exportToJira = async () => {
-    // Collect all row content
-    const contentRows = rowKeys.map(key => rows.get(key) || "").filter(content => content.trim() !== "");
-
-    // Format as Jira markdown
-    const jiraMarkdown = `h2. ${pageTitle || "Untitled Page"}
-
-*URL:* ${url || "N/A"}
-*Cart ID:* ${cartId || "N/A"}
-*Last Updated:* ${lastUpdated}
-*Progress:* ${getProgressPercentage()}%
-
-h3. Status
-${briefed ? "✅" : "⬜"} Briefed
-${designed ? "✅" : "⬜"} Designed
-${built ? "✅" : "⬜"} Built
-${done ? "✅" : "⬜"} Done
-
-h3. Content Wireframe
-${contentRows.length > 0 ? contentRows.map((content, i) => `${i + 1}. ${content}`).join("\n") : "_No content rows added yet_"}
-
-----
-_Exported from FigJam Wireframe Widget_`;
-
-    console.log("=== JIRA EXPORT ===");
-    console.log(jiraMarkdown);
-    console.log("===================");
-
-    figma.notify("📋 Jira export generated! Check browser console (F12) and copy the formatted text.", { timeout: 4000 });
-  };
-
   // Initialize widget with default rows
   useEffect(() => {
     if (initialized) return;
     setInitialized(true);
     initialRows.forEach((initialRow) => {
       rows.set(initialRow.rowKey, initialRow.text || "");
-      rowColors.set(initialRow.rowKey, initialRow.color || colors[0]);
+      rowColors.set(initialRow.rowKey, initialRow.color || colors[5]);
     });
   });
 
@@ -221,6 +189,92 @@ _Exported from FigJam Wireframe Widget_`;
       stroke="#333333"
       strokeWidth={2}
     >
+      {/* Progress Slider */}
+      <AutoLayout
+        direction="vertical"
+        width={"fill-parent"}
+        spacing={8}
+      >
+        {/* Progress labels */}
+        <AutoLayout
+          direction="horizontal"
+          width={"fill-parent"}
+          horizontalAlignItems="space-between"
+        >
+          {[
+            { text: "BRIEFED", state: briefed, setState: setBriefed },
+            { text: "DESIGNED", state: designed, setState: setDesigned },
+            { text: "BUILT", state: built, setState: setBuilt },
+            { text: "DONE", state: done, setState: setDone },
+          ].map((status, index) => (
+            <AutoLayout
+              key={status.text}
+              onClick={() => {
+                // Set this stage and all previous stages to true
+                setBriefed(index >= 0);
+                setDesigned(index >= 1);
+                setBuilt(index >= 2);
+                setDone(index >= 3);
+                updateLastModified();
+              }}
+              hoverStyle={{ opacity: 0.7 }}
+            >
+              <Text
+                fontSize={9}
+                fontWeight={status.state ? 700 : 400}
+                fontFamily="Roboto Mono"
+                fill={status.state ? "#4CAF50" : "#999999"}
+              >
+                {status.text}
+              </Text>
+            </AutoLayout>
+          ))}
+        </AutoLayout>
+
+        {/* Progress Bar */}
+        <AutoLayout
+          width={"fill-parent"}
+          height={12}
+          fill="#E8E8E8"
+          cornerRadius={6}
+          overflow="hidden"
+          onClick={(e) => {
+            // Calculate which stage was clicked based on position
+            const percentage = e.x / (width as number - 32);
+            if (percentage < 0.25) {
+              setBriefed(true);
+              setDesigned(false);
+              setBuilt(false);
+              setDone(false);
+            } else if (percentage < 0.5) {
+              setBriefed(true);
+              setDesigned(true);
+              setBuilt(false);
+              setDone(false);
+            } else if (percentage < 0.75) {
+              setBriefed(true);
+              setDesigned(true);
+              setBuilt(true);
+              setDone(false);
+            } else {
+              setBriefed(true);
+              setDesigned(true);
+              setBuilt(true);
+              setDone(true);
+            }
+            updateLastModified();
+          }}
+        >
+          {getProgressPercentage() > 0 && (
+            <AutoLayout
+              width={(width as number - 32) * (getProgressPercentage() / 100)}
+              height={12}
+              fill="#4CAF50"
+            />
+          )}
+        </AutoLayout>
+      </AutoLayout>
+
       {/* Header */}
       <AutoLayout
         direction="horizontal"
@@ -259,117 +313,24 @@ _Exported from FigJam Wireframe Widget_`;
           />
         </AutoLayout>
 
-        {/* Export to Jira Button */}
-        <AutoLayout
-          padding={8}
-          fill="#0052CC"
-          cornerRadius={6}
-          hoverStyle={{ fill: "#0065FF" }}
-          onClick={exportToJira}
-          tooltip="Export to Jira"
-        >
-          <SVG
-            src={`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 12L12 22L22 12L12 2Z" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/><path d="M12 8V16M8 12H16" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/></svg>`}
-          />
-        </AutoLayout>
-
         <AutoLayout width={"fill-parent"} />
 
-        {/* Last Updated */}
-        <Text
-          fontSize={10}
-          fontFamily="Roboto Mono"
-          fill="#666666"
-        >
-          {lastUpdated}
-        </Text>
-      </AutoLayout>
-
-      {/* Progress Bar */}
-      <AutoLayout
-        direction="vertical"
-        width={"fill-parent"}
-        spacing={8}
-      >
-        {/* Progress Bar Visual */}
-        <AutoLayout
-          width={"fill-parent"}
-          height={8}
-          fill="#E8E8E8"
-          cornerRadius={4}
-          overflow="hidden"
-        >
-          {getProgressPercentage() > 0 && (
-            <AutoLayout
-              width={(width as number - 32) * (getProgressPercentage() / 100)}
-              height={8}
-              fill="#4CAF50"
-            />
-          )}
-        </AutoLayout>
-
-        {/* Progress Checkboxes */}
-        <AutoLayout
-          direction="horizontal"
-          width={"fill-parent"}
-          spacing={8}
-        >
-          {[
-            {
-              text: "BRIEFED",
-              state: briefed,
-              setState: (val: boolean) => { setBriefed(val); updateLastModified(); },
-            },
-            {
-              text: "DESIGNED",
-              state: designed,
-              setState: (val: boolean) => { setDesigned(val); updateLastModified(); },
-            },
-            {
-              text: "BUILT",
-              state: built,
-              setState: (val: boolean) => { setBuilt(val); updateLastModified(); },
-            },
-            {
-              text: "DONE",
-              state: done,
-              setState: (val: boolean) => { setDone(val); updateLastModified(); },
-            },
-          ].map((status) => (
-            <AutoLayout
-              key={status.text}
-              direction="horizontal"
-              spacing={6}
-              verticalAlignItems="center"
-              onClick={() => status.setState(!status.state)}
-              hoverStyle={{ opacity: 0.7 }}
-            >
-              <AutoLayout
-                width={20}
-                height={20}
-                fill={status.state ? "#4CAF50" : "#FFFFFF"}
-                stroke="#CCCCCC"
-                strokeWidth={1}
-                cornerRadius={4}
-                horizontalAlignItems="center"
-                verticalAlignItems="center"
-              >
-                {status.state && (
-                  <SVG
-                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 10L8 13L15 6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                  />
-                )}
-              </AutoLayout>
-              <Text
-                fontSize={9}
-                fontWeight={700}
-                fontFamily="Roboto Mono"
-                fill="#333333"
-              >
-                {status.text}
-              </Text>
-            </AutoLayout>
-          ))}
+        {/* Last Updated - Editable */}
+        <AutoLayout direction="vertical" spacing={4}>
+          <Text fontSize={8} fontFamily="Roboto Mono" fill="#999999">
+            LAST UPDATED
+          </Text>
+          <Input
+            value={lastUpdated}
+            fontSize={10}
+            fontFamily="Roboto Mono"
+            onTextEditEnd={(e) => setLastUpdated(e.characters)}
+            inputFrameProps={{
+              fill: "#F5F5F5",
+              padding: { horizontal: 8, vertical: 4 },
+              cornerRadius: 4,
+            }}
+          />
         </AutoLayout>
       </AutoLayout>
 
@@ -472,7 +433,7 @@ _Exported from FigJam Wireframe Widget_`;
                   padding={6}
                   fill="#333333"
                   cornerRadius={6}
-                  stroke={isSelected ? "#000000" : "#666666"}
+                  stroke="#CCCCCC"
                   strokeWidth={2}
                 >
                   <SVG
