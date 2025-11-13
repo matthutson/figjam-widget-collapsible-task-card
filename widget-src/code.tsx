@@ -181,111 +181,14 @@ function CollapsibleTaskCard() {
       verticalAlignItems="center"
       width={width}
       fill={color}
-      spacing={12}
-      padding={16}
-      cornerRadius={12}
+      spacing={8}
+      padding={12}
+      cornerRadius={10}
       overflow="visible"
       effect={shadow}
       stroke="#333333"
       strokeWidth={2}
     >
-      {/* Progress Slider */}
-      <AutoLayout
-        direction="vertical"
-        width={"fill-parent"}
-        spacing={4}
-      >
-        {/* Slider Track with Marks */}
-        <AutoLayout
-          direction="horizontal"
-          width={"fill-parent"}
-          verticalAlignItems="center"
-          spacing={0}
-        >
-          {[
-            { text: "BRIEFED", percentage: 25 },
-            { text: "DESIGNED", percentage: 50 },
-            { text: "BUILT", percentage: 75 },
-            { text: "DONE", percentage: 100 },
-          ].map((stage, index) => {
-            const isActive = getProgressPercentage() >= stage.percentage;
-            return (
-              <AutoLayout
-                key={stage.text}
-                direction="vertical"
-                width={"fill-parent"}
-                spacing={6}
-                verticalAlignItems="center"
-              >
-                {/* Mark label */}
-                <Text
-                  fontSize={9}
-                  fontWeight={isActive ? 700 : 400}
-                  fontFamily="Roboto Mono"
-                  fill={isActive ? "#4CAF50" : "#999999"}
-                >
-                  {stage.text}
-                </Text>
-
-                {/* Track segment with mark */}
-                <AutoLayout
-                  direction="vertical"
-                  width={"fill-parent"}
-                  spacing={0}
-                  verticalAlignItems="center"
-                >
-                  {/* Mark dot */}
-                  <AutoLayout
-                    width={12}
-                    height={12}
-                    fill={isActive ? "#4CAF50" : "#E8E8E8"}
-                    stroke={isActive ? "#4CAF50" : "#CCCCCC"}
-                    strokeWidth={2}
-                    cornerRadius={6}
-                    onClick={() => {
-                      setBriefed(index >= 0);
-                      setDesigned(index >= 1);
-                      setBuilt(index >= 2);
-                      setDone(index >= 3);
-                      updateLastModified();
-                    }}
-                    hoverStyle={{ opacity: 0.7 }}
-                  />
-
-                  {/* Track line (except for last item) */}
-                  {index < 3 && (
-                    <AutoLayout
-                      width={"fill-parent"}
-                      height={4}
-                      fill={getProgressPercentage() > stage.percentage ? "#4CAF50" : "#E8E8E8"}
-                      onClick={() => {
-                        setBriefed(index >= 0);
-                        setDesigned(index >= 1);
-                        setBuilt(index >= 2);
-                        setDone(index >= 3);
-                        updateLastModified();
-                      }}
-                    />
-                  )}
-                </AutoLayout>
-              </AutoLayout>
-            );
-          })}
-        </AutoLayout>
-
-        {/* Progress percentage label */}
-        <Text
-          fontSize={11}
-          fontFamily="Roboto Mono"
-          fontWeight={700}
-          fill="#666666"
-          horizontalAlignText="center"
-          width={"fill-parent"}
-        >
-          {getProgressPercentage()}%
-        </Text>
-      </AutoLayout>
-
       {/* Header */}
       <AutoLayout
         direction="horizontal"
@@ -293,62 +196,120 @@ function CollapsibleTaskCard() {
         verticalAlignItems="center"
         width={"fill-parent"}
         height={"hug-contents"}
-        spacing={12}
+        spacing={8}
       >
         {/* Collapse/Expand Arrow */}
         <AutoLayout
-          padding={8}
+          padding={4}
           onClick={() => setCollapsed(!collapsed)}
           hoverStyle={{ opacity: 0.7 }}
           tooltip={collapsed ? "Expand" : "Collapse"}
         >
           <SVG
             src={collapsed
-              ? `<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 24L30 34L40 24" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-              : `<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 36L30 26L40 36" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 10L12 14L16 10" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 14L12 10L16 14" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
             }
           />
         </AutoLayout>
 
         {/* Duplicate Button */}
         <AutoLayout
-          padding={8}
+          padding={4}
           fill="#F5F5F5"
-          cornerRadius={6}
+          cornerRadius={4}
           hoverStyle={{ fill: "#E8E8E8" }}
           onClick={duplicateWidget}
           tooltip="Duplicate this card"
         >
           <SVG
-            src={`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" stroke="#333333" stroke-width="2"/><path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="#333333" stroke-width="2"/></svg>`}
+            src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="7" width="10" height="10" rx="1.5" stroke="#333333" stroke-width="1.5"/><path d="M4 11H3C2.44772 11 2 10.5523 2 10V3C2 2.44772 2.44772 2 3 2H10C10.5523 2 11 2.44772 11 3V4" stroke="#333333" stroke-width="1.5"/></svg>`}
           />
         </AutoLayout>
 
         <AutoLayout width={"fill-parent"} />
 
-        {/* Last Updated - Editable */}
-        <AutoLayout direction="vertical" spacing={4}>
-          <Text fontSize={8} fontFamily="Roboto Mono" fill="#999999">
-            LAST UPDATED
-          </Text>
-          <Input
-            value={lastUpdated}
-            fontSize={10}
-            fontFamily="Roboto Mono"
-            onTextEditEnd={(e) => setLastUpdated(e.characters)}
-            inputFrameProps={{
-              fill: "#F5F5F5",
-              padding: { horizontal: 8, vertical: 4 },
-              cornerRadius: 4,
-            }}
-          />
+        {/* Status Checkboxes */}
+        <AutoLayout
+          direction="horizontal"
+          spacing={8}
+        >
+          {[
+            {
+              text: "BRIEFED",
+              state: briefed,
+              setState: (val: boolean) => { setBriefed(val); updateLastModified(); },
+            },
+            {
+              text: "DESIGNED",
+              state: designed,
+              setState: (val: boolean) => { setDesigned(val); updateLastModified(); },
+            },
+            {
+              text: "BUILT",
+              state: built,
+              setState: (val: boolean) => { setBuilt(val); updateLastModified(); },
+            },
+            {
+              text: "DONE",
+              state: done,
+              setState: (val: boolean) => { setDone(val); updateLastModified(); },
+            },
+          ].map((status) => (
+            <AutoLayout
+              key={status.text}
+              direction="vertical"
+              spacing={4}
+              verticalAlignItems="center"
+              onClick={() => status.setState(!status.state)}
+              hoverStyle={{ opacity: 0.7 }}
+            >
+              <Text fontSize={8} fontFamily="Roboto Mono" fill="#666666">
+                {status.text}
+              </Text>
+              <AutoLayout
+                width={16}
+                height={16}
+                fill={status.state ? "#4CAF50" : "#FFFFFF"}
+                stroke="#CCCCCC"
+                strokeWidth={1}
+                cornerRadius={3}
+                horizontalAlignItems="center"
+                verticalAlignItems="center"
+              >
+                {status.state && (
+                  <SVG
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 8L6.5 10.5L12 5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                  />
+                )}
+              </AutoLayout>
+            </AutoLayout>
+          ))}
         </AutoLayout>
       </AutoLayout>
 
+      {/* Live Date Field */}
+      <AutoLayout direction="horizontal" width={"fill-parent"} spacing={6} verticalAlignItems="center">
+        <Text fontSize={10} fontFamily="Roboto Mono" fill="#999999" fontWeight={700}>
+          LIVE DATE:
+        </Text>
+        <Input
+          value={lastUpdated}
+          fontSize={10}
+          fontFamily="Roboto Mono"
+          onTextEditEnd={(e) => setLastUpdated(e.characters)}
+          inputFrameProps={{
+            fill: "#F5F5F5",
+            padding: { horizontal: 6, vertical: 3 },
+            cornerRadius: 3,
+          }}
+        />
+      </AutoLayout>
+
       {/* Page Title - Main Field */}
-      <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
+      <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
         <Text
-          fontSize={13}
+          fontSize={11}
           fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
@@ -359,10 +320,10 @@ function CollapsibleTaskCard() {
           width={"fill-parent"}
           placeholder="Enter page title..."
           value={pageTitle}
-          fontSize={28}
+          fontSize={24}
           fontWeight={700}
           fontFamily="Roboto Mono"
-          lineHeight={36}
+          lineHeight={30}
           onTextEditEnd={(e) => {
             setPageTitle(e.characters);
           }}
@@ -371,16 +332,16 @@ function CollapsibleTaskCard() {
             fill: "#FFFFFF",
             stroke: "#CCCCCC",
             strokeWidth: 1.5,
-            padding: { horizontal: 16, vertical: 16 },
-            cornerRadius: 10,
+            padding: { horizontal: 12, vertical: 12 },
+            cornerRadius: 8,
           }}
         />
       </AutoLayout>
 
       {/* URL Field */}
-      <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
+      <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
         <Text
-          fontSize={13}
+          fontSize={11}
           fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
@@ -391,7 +352,7 @@ function CollapsibleTaskCard() {
           width={"fill-parent"}
           placeholder="https://..."
           value={url}
-          fontSize={14}
+          fontSize={12}
           fontFamily="Roboto Mono"
           onTextEditEnd={(e) => {
             setUrl(e.characters);
@@ -400,8 +361,8 @@ function CollapsibleTaskCard() {
             fill: "#FFFFFF",
             stroke: "#CCCCCC",
             strokeWidth: 1,
-            padding: { horizontal: 14, vertical: 10 },
-            cornerRadius: 8,
+            padding: { horizontal: 10, vertical: 8 },
+            cornerRadius: 6,
           }}
         />
       </AutoLayout>
@@ -410,14 +371,14 @@ function CollapsibleTaskCard() {
       <AutoLayout
         direction="vertical"
         width={"fill-parent"}
-        spacing={8}
+        spacing={6}
         hidden={collapsed}
       >
         {/* Text Rows */}
         <AutoLayout
           direction="vertical"
           width={"fill-parent"}
-          spacing={4}
+          spacing={3}
         >
 
           {rowKeys.map((rowKey, index) => {
@@ -440,22 +401,22 @@ function CollapsibleTaskCard() {
                 {/* Reorder controls */}
                 <AutoLayout
                   direction="vertical"
-                  spacing={4}
-                  padding={6}
-                  fill="#333333"
-                  cornerRadius={6}
+                  spacing={2}
+                  padding={4}
+                  fill="#E8E8E8"
+                  cornerRadius={4}
                   stroke="#CCCCCC"
-                  strokeWidth={2}
+                  strokeWidth={1}
                 >
                   <SVG
-                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 15L10 5M10 5L6 9M10 5L14 9" stroke="${isFirst ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12L8 4M8 4L5 7M8 4L11 7" stroke="${isFirst ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                     opacity={isFirst ? 0.4 : 1}
                     hoverStyle={{ opacity: isFirst ? 0.4 : 1 }}
                     onClick={() => { if (!isFirst) moveRowUp(rowKey); }}
                     tooltip={isFirst ? "" : "Move up"}
                   />
                   <SVG
-                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 5L10 15M10 15L14 11M10 15L6 11" stroke="${isLast ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4L8 12M8 12L11 9M8 12L5 9" stroke="${isLast ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                     opacity={isLast ? 0.4 : 1}
                     hoverStyle={{ opacity: isLast ? 0.4 : 1 }}
                     onClick={() => { if (!isLast) moveRowDown(rowKey); }}
@@ -468,7 +429,7 @@ function CollapsibleTaskCard() {
                   width={"fill-parent"}
                   direction="horizontal"
                   verticalAlignItems="center"
-                  spacing={6}
+                  spacing={4}
                 >
                   <Input
                     value={rowContent}
@@ -476,23 +437,23 @@ function CollapsibleTaskCard() {
                     onTextEditEnd={(e) => rows.set(rowKey, e.characters)}
                     inputBehavior="multiline"
                     width={"fill-parent"}
-                    fontSize={14}
+                    fontSize={12}
                     fontFamily="Roboto Mono"
                     inputFrameProps={{
                       fill: rowColor,
                       stroke: isSelected ? "#333333" : "#CCCCCC",
                       strokeWidth: isSelected ? 2 : 1,
-                      padding: { horizontal: 14, vertical: 10 },
-                      cornerRadius: 8,
-                      height: rowContent ? "hug-contents" : 60,
+                      padding: { horizontal: 10, vertical: 8 },
+                      cornerRadius: 6,
+                      height: rowContent ? "hug-contents" : 50,
                     }}
                   />
                   {/* Delete button */}
                   <AutoLayout
-                    padding={4}
+                    padding={2}
                   >
                     <SVG
-                      src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" fill="#FF4444" opacity="0"/><path d="M12 6L6 12M6 6L12 12" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                      src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L6 10M6 6L10 10" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                       opacity={0}
                       hoverStyle={{ opacity: 1 }}
                       onClick={() => deleteRow(rowKey)}
@@ -510,23 +471,23 @@ function CollapsibleTaskCard() {
       <AutoLayout
         hidden={collapsed}
         width={"fill-parent"}
-        height={36}
+        height={30}
         fill={"#F5F5F5"}
         stroke="#CCCCCC"
         strokeWidth={1}
         hoverStyle={{ fill: "#E8E8E8" }}
-        cornerRadius={8}
+        cornerRadius={6}
         horizontalAlignItems="center"
         verticalAlignItems="center"
-        spacing={6}
+        spacing={4}
         onClick={addRow}
         tooltip="Add new row"
       >
-        <Text fontSize={18} fill={"#666666"} fontWeight={400}>
+        <Text fontSize={16} fill={"#666666"} fontWeight={400}>
           +
         </Text>
         <Text
-          fontSize={13}
+          fontSize={11}
           fontFamily="Roboto Mono"
           fontWeight={700}
           fill={"#666666"}
@@ -539,11 +500,11 @@ function CollapsibleTaskCard() {
       <AutoLayout
         direction="vertical"
         width={"fill-parent"}
-        spacing={6}
+        spacing={4}
         hidden={collapsed}
       >
         <Text
-          fontSize={13}
+          fontSize={11}
           fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
@@ -554,7 +515,7 @@ function CollapsibleTaskCard() {
           width={"fill-parent"}
           placeholder="Optional cart identifier..."
           value={cartId}
-          fontSize={14}
+          fontSize={12}
           fontFamily="Roboto Mono"
           onTextEditEnd={(e) => {
             setCartId(e.characters);
@@ -563,8 +524,8 @@ function CollapsibleTaskCard() {
             fill: "#FFFFFF",
             stroke: "#CCCCCC",
             strokeWidth: 1,
-            padding: { horizontal: 14, vertical: 10 },
-            cornerRadius: 8,
+            padding: { horizontal: 10, vertical: 8 },
+            cornerRadius: 6,
           }}
         />
       </AutoLayout>
