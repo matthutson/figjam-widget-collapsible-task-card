@@ -26,8 +26,7 @@ function CollapsibleTaskCard() {
   const [collapsed, setCollapsed] = useSyncedState("collapsed", false);
   const [pageTitle, setPageTitle] = useSyncedState("pageTitle", "");
   const [url, setUrl] = useSyncedState("url", "");
-  const [linkedFrom, setLinkedFrom] = useSyncedState("linkedFrom", "");
-  const [linkedTo, setLinkedTo] = useSyncedState("linkedTo", "");
+  const [cartId, setCartId] = useSyncedState("cartId", "");
   const [briefed, setBriefed] = useSyncedState<boolean>(
     "briefed",
     false
@@ -166,6 +165,8 @@ function CollapsibleTaskCard() {
       cornerRadius={12}
       overflow="visible"
       effect={shadow}
+      stroke="#333333"
+      strokeWidth={2}
     >
       {/* Header */}
       <AutoLayout
@@ -322,72 +323,6 @@ function CollapsibleTaskCard() {
         spacing={8}
         hidden={collapsed}
       >
-        {/* Linked From / Linked To fields */}
-        <AutoLayout
-          direction="horizontal"
-          width={"fill-parent"}
-          spacing={8}
-        >
-          <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
-            <Text
-              fontSize={13}
-              fontWeight={600}
-              fontFamily="Roboto Mono"
-              fill="#333333"
-            >
-              LINKED FROM
-            </Text>
-            <Input
-              fontSize={13}
-              fontFamily="Roboto Mono"
-              value={linkedFrom}
-              placeholder="Pages linking here..."
-              onTextEditEnd={(e) => {
-                setLinkedFrom(e.characters);
-              }}
-              inputBehavior="multiline"
-              width={"fill-parent"}
-              inputFrameProps={{
-                fill: "#FFFFFF",
-                stroke: "#CCCCCC",
-                strokeWidth: 1,
-                padding: { horizontal: 12, vertical: 10 },
-                cornerRadius: 8,
-                width: "fill-parent",
-              }}
-            />
-          </AutoLayout>
-          <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
-            <Text
-              fontSize={13}
-              fontWeight={600}
-              fontFamily="Roboto Mono"
-              fill="#333333"
-            >
-              LINKED TO
-            </Text>
-            <Input
-              fontSize={13}
-              fontFamily="Roboto Mono"
-              value={linkedTo}
-              placeholder="Links to other pages..."
-              onTextEditEnd={(e) => {
-                setLinkedTo(e.characters);
-              }}
-              inputBehavior="multiline"
-              width={"fill-parent"}
-              inputFrameProps={{
-                fill: "#FFFFFF",
-                stroke: "#CCCCCC",
-                strokeWidth: 1,
-                padding: { horizontal: 12, vertical: 10 },
-                cornerRadius: 8,
-                width: "fill-parent",
-              }}
-            />
-          </AutoLayout>
-        </AutoLayout>
-
         {/* Text Rows */}
         <AutoLayout
           direction="vertical"
@@ -408,38 +343,41 @@ function CollapsibleTaskCard() {
                 direction="horizontal"
                 width={"fill-parent"}
                 verticalAlignItems="center"
-                spacing={8}
+                spacing={6}
                 onClick={() => setSelectedRowKey(rowKey)}
-                {...(isSelected && { stroke: "#333333", strokeWidth: 2 })}
                 cornerRadius={8}
-                padding={2}
               >
                 {/* Reorder controls */}
                 <AutoLayout
                   direction="vertical"
-                  spacing={2}
-                  padding={4}
+                  spacing={4}
+                  padding={6}
+                  fill="#F0F0F0"
+                  cornerRadius={6}
+                  stroke={isSelected ? "#333333" : "#CCCCCC"}
+                  strokeWidth={1}
                 >
                   <SVG
-                    src={`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L6 3M6 3L3 6M6 3L9 6" stroke="${isFirst ? '#CCCCCC' : '#666666'}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    opacity={isFirst ? 0.3 : 0.6}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12L8 4M8 4L5 7M8 4L11 7" stroke="${isFirst ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isFirst ? 0.3 : 1}
                     hoverStyle={{ opacity: isFirst ? 0.3 : 1 }}
                     onClick={() => !isFirst && moveRowUp(rowKey)}
                     tooltip={isFirst ? "" : "Move up"}
                   />
                   <SVG
-                    src={`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 3L6 9M6 9L9 6M6 9L3 6" stroke="${isLast ? '#CCCCCC' : '#666666'}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    opacity={isLast ? 0.3 : 0.6}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4L8 12M8 12L11 9M8 12L5 9" stroke="${isLast ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isLast ? 0.3 : 1}
                     hoverStyle={{ opacity: isLast ? 0.3 : 1 }}
                     onClick={() => !isLast && moveRowDown(rowKey)}
                     tooltip={isLast ? "" : "Move down"}
                   />
                 </AutoLayout>
 
-                {/* Row content */}
+                {/* Row content with delete button overlay */}
                 <AutoLayout
                   width={"fill-parent"}
                   verticalAlignItems="center"
+                  positioning="relative"
                 >
                   <Input
                     value={rowContent}
@@ -453,23 +391,26 @@ function CollapsibleTaskCard() {
                       fill: rowColor,
                       stroke: isSelected ? "#333333" : "#CCCCCC",
                       strokeWidth: isSelected ? 2 : 1,
-                      padding: { horizontal: 14, vertical: 10 },
+                      padding: { horizontal: 14, vertical: 10, right: 40 },
                       cornerRadius: 8,
                       width: "fill-parent",
                       height: rowContent ? "hug-contents" : 60,
                     }}
                   />
-                </AutoLayout>
-
-                {/* Delete button */}
-                <AutoLayout padding={4}>
-                  <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4L4 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4L12 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    opacity={0}
-                    hoverStyle={{ opacity: 1 }}
-                    onClick={() => deleteRow(rowKey)}
-                    tooltip="Delete row"
-                  />
+                  {/* Delete button positioned at top-right corner */}
+                  <AutoLayout
+                    positioning="absolute"
+                    x={{ type: "end", offset: 8 }}
+                    y={{ type: "start", offset: 8 }}
+                  >
+                    <SVG
+                      src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" fill="#FF4444" opacity="0"/><path d="M12 6L6 12M6 6L12 12" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                      opacity={0}
+                      hoverStyle={{ opacity: 1 }}
+                      onClick={() => deleteRow(rowKey)}
+                      tooltip="Delete row"
+                    />
+                  </AutoLayout>
                 </AutoLayout>
               </AutoLayout>
             );
@@ -504,6 +445,41 @@ function CollapsibleTaskCard() {
         >
           ADD ROW
         </Text>
+      </AutoLayout>
+
+      {/* Cart ID Field */}
+      <AutoLayout
+        direction="vertical"
+        width={"fill-parent"}
+        spacing={6}
+        hidden={collapsed}
+      >
+        <Text
+          fontSize={13}
+          fontWeight={600}
+          fontFamily="Roboto Mono"
+          fill="#333333"
+        >
+          CART ID (IF RELEVANT)
+        </Text>
+        <Input
+          width={"fill-parent"}
+          placeholder="Optional cart identifier..."
+          value={cartId}
+          fontSize={14}
+          fontFamily="Roboto Mono"
+          onTextEditEnd={(e) => {
+            setCartId(e.characters);
+          }}
+          inputFrameProps={{
+            fill: "#FFFFFF",
+            stroke: "#CCCCCC",
+            strokeWidth: 1,
+            padding: { horizontal: 14, vertical: 10 },
+            cornerRadius: 8,
+            width: "fill-parent",
+          }}
+        />
       </AutoLayout>
     </AutoLayout>
   );
