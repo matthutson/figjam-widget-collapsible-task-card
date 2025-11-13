@@ -209,7 +209,7 @@ function CollapsibleTaskCard() {
               <Text
                 fontSize={10}
                 fontWeight={700}
-                fontFamily="Montserrat"
+                fontFamily="Roboto Mono"
                 fill="#333333"
               >
                 {status.text}
@@ -237,7 +237,7 @@ function CollapsibleTaskCard() {
         <Text
           fontSize={13}
           fontWeight={600}
-          fontFamily="Montserrat"
+          fontFamily="Roboto Mono"
           fill="#333333"
         >
           PAGE TITLE
@@ -248,7 +248,7 @@ function CollapsibleTaskCard() {
           value={pageTitle}
           fontSize={28}
           fontWeight={700}
-          fontFamily="Montserrat"
+          fontFamily="Roboto Mono"
           lineHeight={36}
           onTextEditEnd={(e) => {
             setPageTitle(e.characters);
@@ -270,7 +270,7 @@ function CollapsibleTaskCard() {
         <Text
           fontSize={13}
           fontWeight={600}
-          fontFamily="Montserrat"
+          fontFamily="Roboto Mono"
           fill="#333333"
         >
           URL
@@ -280,7 +280,7 @@ function CollapsibleTaskCard() {
           placeholder="https://..."
           value={url}
           fontSize={14}
-          fontFamily="Montserrat"
+          fontFamily="Roboto Mono"
           onTextEditEnd={(e) => {
             setUrl(e.characters);
           }}
@@ -312,14 +312,14 @@ function CollapsibleTaskCard() {
             <Text
               fontSize={13}
               fontWeight={600}
-              fontFamily="Montserrat"
+              fontFamily="Roboto Mono"
               fill="#333333"
             >
               LINKED FROM
             </Text>
             <Input
               fontSize={13}
-              fontFamily="Montserrat"
+              fontFamily="Roboto Mono"
               value={linkedFrom}
               placeholder="Pages linking here..."
               onTextEditEnd={(e) => {
@@ -341,14 +341,14 @@ function CollapsibleTaskCard() {
             <Text
               fontSize={13}
               fontWeight={600}
-              fontFamily="Montserrat"
+              fontFamily="Roboto Mono"
               fill="#333333"
             >
               LINKED TO
             </Text>
             <Input
               fontSize={13}
-              fontFamily="Montserrat"
+              fontFamily="Roboto Mono"
               value={linkedTo}
               placeholder="Links to other pages..."
               onTextEditEnd={(e) => {
@@ -412,7 +412,7 @@ function CollapsibleTaskCard() {
                     inputBehavior="multiline"
                     width={"fill-parent"}
                     fontSize={14}
-                    fontFamily="Montserrat"
+                    fontFamily="Roboto Mono"
                     inputFrameProps={{
                       fill: rowColor,
                       stroke: "#CCCCCC",
@@ -461,7 +461,7 @@ function CollapsibleTaskCard() {
         </Text>
         <Text
           fontSize={13}
-          fontFamily="Montserrat"
+          fontFamily="Roboto Mono"
           fontWeight={600}
           fill={"#666666"}
         >
