@@ -193,87 +193,97 @@ function CollapsibleTaskCard() {
       <AutoLayout
         direction="vertical"
         width={"fill-parent"}
-        spacing={8}
+        spacing={4}
       >
-        {/* Progress labels */}
+        {/* Slider Track with Marks */}
         <AutoLayout
           direction="horizontal"
           width={"fill-parent"}
+          verticalAlignItems="center"
+          spacing={0}
         >
           {[
-            { text: "BRIEFED", state: briefed, setState: setBriefed },
-            { text: "DESIGNED", state: designed, setState: setDesigned },
-            { text: "BUILT", state: built, setState: setBuilt },
-            { text: "DONE", state: done, setState: setDone },
-          ].map((status, index) => (
-            <AutoLayout
-              key={status.text}
-              width={"fill-parent"}
-              horizontalAlignItems="center"
-              onClick={() => {
-                // Set this stage and all previous stages to true
-                setBriefed(index >= 0);
-                setDesigned(index >= 1);
-                setBuilt(index >= 2);
-                setDone(index >= 3);
-                updateLastModified();
-              }}
-              hoverStyle={{ opacity: 0.7 }}
-            >
-              <Text
-                fontSize={9}
-                fontWeight={status.state ? 700 : 400}
-                fontFamily="Roboto Mono"
-                fill={status.state ? "#4CAF50" : "#999999"}
+            { text: "BRIEFED", percentage: 25 },
+            { text: "DESIGNED", percentage: 50 },
+            { text: "BUILT", percentage: 75 },
+            { text: "DONE", percentage: 100 },
+          ].map((stage, index) => {
+            const isActive = getProgressPercentage() >= stage.percentage;
+            return (
+              <AutoLayout
+                key={stage.text}
+                direction="vertical"
+                width={"fill-parent"}
+                spacing={6}
+                verticalAlignItems="center"
               >
-                {status.text}
-              </Text>
-            </AutoLayout>
-          ))}
+                {/* Mark label */}
+                <Text
+                  fontSize={9}
+                  fontWeight={isActive ? 700 : 400}
+                  fontFamily="Roboto Mono"
+                  fill={isActive ? "#4CAF50" : "#999999"}
+                >
+                  {stage.text}
+                </Text>
+
+                {/* Track segment with mark */}
+                <AutoLayout
+                  direction="vertical"
+                  width={"fill-parent"}
+                  spacing={0}
+                  verticalAlignItems="center"
+                >
+                  {/* Mark dot */}
+                  <AutoLayout
+                    width={12}
+                    height={12}
+                    fill={isActive ? "#4CAF50" : "#E8E8E8"}
+                    stroke={isActive ? "#4CAF50" : "#CCCCCC"}
+                    strokeWidth={2}
+                    cornerRadius={6}
+                    onClick={() => {
+                      setBriefed(index >= 0);
+                      setDesigned(index >= 1);
+                      setBuilt(index >= 2);
+                      setDone(index >= 3);
+                      updateLastModified();
+                    }}
+                    hoverStyle={{ opacity: 0.7 }}
+                  />
+
+                  {/* Track line (except for last item) */}
+                  {index < 3 && (
+                    <AutoLayout
+                      width={"fill-parent"}
+                      height={4}
+                      fill={getProgressPercentage() > stage.percentage ? "#4CAF50" : "#E8E8E8"}
+                      onClick={() => {
+                        setBriefed(index >= 0);
+                        setDesigned(index >= 1);
+                        setBuilt(index >= 2);
+                        setDone(index >= 3);
+                        updateLastModified();
+                      }}
+                    />
+                  )}
+                </AutoLayout>
+              </AutoLayout>
+            );
+          })}
         </AutoLayout>
 
-        {/* Progress Bar */}
-        <AutoLayout
+        {/* Progress percentage label */}
+        <Text
+          fontSize={11}
+          fontFamily="Roboto Mono"
+          fontWeight={700}
+          fill="#666666"
+          horizontalAlignText="center"
           width={"fill-parent"}
-          height={12}
-          fill="#E8E8E8"
-          cornerRadius={6}
-          overflow="hidden"
-          onClick={(e) => {
-            // Calculate which stage was clicked based on position
-            const percentage = e.x / (width as number - 32);
-            if (percentage < 0.25) {
-              setBriefed(true);
-              setDesigned(false);
-              setBuilt(false);
-              setDone(false);
-            } else if (percentage < 0.5) {
-              setBriefed(true);
-              setDesigned(true);
-              setBuilt(false);
-              setDone(false);
-            } else if (percentage < 0.75) {
-              setBriefed(true);
-              setDesigned(true);
-              setBuilt(true);
-              setDone(false);
-            } else {
-              setBriefed(true);
-              setDesigned(true);
-              setBuilt(true);
-              setDone(true);
-            }
-            updateLastModified();
-          }}
         >
-          {getProgressPercentage() > 0 && (
-            <AutoLayout
-              width={(width as number - 32) * (getProgressPercentage() / 100)}
-              height={12}
-              fill="#4CAF50"
-            />
-          )}
-        </AutoLayout>
+          {getProgressPercentage()}%
+        </Text>
       </AutoLayout>
 
       {/* Header */}
