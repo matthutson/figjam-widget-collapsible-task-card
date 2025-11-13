@@ -165,8 +165,8 @@ function CollapsibleTaskCard() {
         >
           <SVG
             src={collapsed
-              ? `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12L15 17L20 12" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-              : `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 18L15 13L20 18" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              ? `<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 24L30 34L40 24" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              : `<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 36L30 26L40 36" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
             }
           />
         </AutoLayout>
@@ -260,6 +260,7 @@ function CollapsibleTaskCard() {
             strokeWidth: 1.5,
             padding: { horizontal: 16, vertical: 16 },
             cornerRadius: 10,
+            width: "fill-parent",
           }}
         />
       </AutoLayout>
@@ -289,6 +290,7 @@ function CollapsibleTaskCard() {
             strokeWidth: 1,
             padding: { horizontal: 14, vertical: 10 },
             cornerRadius: 8,
+            width: "fill-parent",
           }}
         />
       </AutoLayout>
@@ -331,6 +333,7 @@ function CollapsibleTaskCard() {
                 strokeWidth: 1,
                 padding: { horizontal: 12, vertical: 10 },
                 cornerRadius: 8,
+                width: "fill-parent",
               }}
             />
           </AutoLayout>
@@ -359,6 +362,7 @@ function CollapsibleTaskCard() {
                 strokeWidth: 1,
                 padding: { horizontal: 12, vertical: 10 },
                 cornerRadius: 8,
+                width: "fill-parent",
               }}
             />
           </AutoLayout>
@@ -384,8 +388,7 @@ function CollapsibleTaskCard() {
                 verticalAlignItems="center"
                 spacing={8}
                 onClick={() => setSelectedRowKey(rowKey)}
-                stroke={isSelected ? "#333333" : "transparent"}
-                strokeWidth={isSelected ? 2 : 0}
+                {...(isSelected && { stroke: "#333333", strokeWidth: 2 })}
                 cornerRadius={8}
                 padding={2}
               >
@@ -416,6 +419,7 @@ function CollapsibleTaskCard() {
                       strokeWidth: 1,
                       padding: { horizontal: 14, vertical: 10 },
                       cornerRadius: 8,
+                      width: "fill-parent",
                     }}
                   />
                 </AutoLayout>
