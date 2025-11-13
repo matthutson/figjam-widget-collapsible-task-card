@@ -290,7 +290,7 @@ function CollapsibleTaskCard() {
 
       {/* Live Date Field */}
       <AutoLayout direction="horizontal" width={"fill-parent"} spacing={6} verticalAlignItems="center">
-        <Text fontSize={10} fontFamily="Roboto Mono" fill="#999999" fontWeight={700}>
+        <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
           LIVE DATE:
         </Text>
         <Input
@@ -330,7 +330,7 @@ function CollapsibleTaskCard() {
           inputBehavior="multiline"
           inputFrameProps={{
             fill: "#FFFFFF",
-            stroke: "#CCCCCC",
+            stroke: "#333333",
             strokeWidth: 1.5,
             padding: { horizontal: 12, vertical: 12 },
             cornerRadius: 8,
@@ -359,7 +359,7 @@ function CollapsibleTaskCard() {
           }}
           inputFrameProps={{
             fill: "#FFFFFF",
-            stroke: "#CCCCCC",
+            stroke: "#333333",
             strokeWidth: 1,
             padding: { horizontal: 10, vertical: 8 },
             cornerRadius: 6,
