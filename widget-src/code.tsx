@@ -200,30 +200,30 @@ function CollapsibleTaskCard() {
       >
         {/* Collapse/Expand Arrow */}
         <AutoLayout
-          padding={4}
+          padding={8}
           onClick={() => setCollapsed(!collapsed)}
           hoverStyle={{ opacity: 0.7 }}
           tooltip={collapsed ? "Expand" : "Collapse"}
         >
           <SVG
             src={collapsed
-              ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 10L12 14L16 10" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-              : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 14L12 10L16 14" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              ? `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 20L24 28L32 20" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              : `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 28L24 20L32 28" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
             }
           />
         </AutoLayout>
 
         {/* Duplicate Button */}
         <AutoLayout
-          padding={4}
+          padding={8}
           fill="#F5F5F5"
-          cornerRadius={4}
+          cornerRadius={6}
           hoverStyle={{ fill: "#E8E8E8" }}
           onClick={duplicateWidget}
           tooltip="Duplicate this card"
         >
           <SVG
-            src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="7" width="10" height="10" rx="1.5" stroke="#333333" stroke-width="1.5"/><path d="M4 11H3C2.44772 11 2 10.5523 2 10V3C2 2.44772 2.44772 2 3 2H10C10.5523 2 11 2.44772 11 3V4" stroke="#333333" stroke-width="1.5"/></svg>`}
+            src={`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="14" width="20" height="20" rx="3" stroke="#333333" stroke-width="3"/><path d="M8 22H6C4.89543 22 4 21.1046 4 20V6C4 4.89543 4.89543 4 6 4H20C21.1046 4 22 4.89543 22 6V8" stroke="#333333" stroke-width="3"/></svg>`}
           />
         </AutoLayout>
 
@@ -259,27 +259,27 @@ function CollapsibleTaskCard() {
             <AutoLayout
               key={status.text}
               direction="vertical"
-              spacing={4}
+              spacing={3}
               verticalAlignItems="center"
               onClick={() => status.setState(!status.state)}
               hoverStyle={{ opacity: 0.7 }}
             >
-              <Text fontSize={8} fontFamily="Roboto Mono" fill="#666666">
+              <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
                 {status.text}
               </Text>
               <AutoLayout
-                width={16}
-                height={16}
+                width={18}
+                height={18}
                 fill={status.state ? "#4CAF50" : "#FFFFFF"}
                 stroke="#CCCCCC"
-                strokeWidth={1}
+                strokeWidth={1.5}
                 cornerRadius={3}
                 horizontalAlignItems="center"
                 verticalAlignItems="center"
               >
                 {status.state && (
                   <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 8L6.5 10.5L12 5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 9L7.5 12L13.5 6" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                   />
                 )}
               </AutoLayout>
