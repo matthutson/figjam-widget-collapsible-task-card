@@ -299,11 +299,13 @@ _Exported from FigJam Wireframe Widget_`;
           cornerRadius={4}
           overflow="hidden"
         >
-          <AutoLayout
-            width={(width as number - 32) * (getProgressPercentage() / 100)}
-            height={8}
-            fill="#4CAF50"
-          />
+          {getProgressPercentage() > 0 && (
+            <AutoLayout
+              width={(width as number - 32) * (getProgressPercentage() / 100)}
+              height={8}
+              fill="#4CAF50"
+            />
+          )}
         </AutoLayout>
 
         {/* Progress Checkboxes */}
