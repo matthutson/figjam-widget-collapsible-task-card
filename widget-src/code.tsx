@@ -360,7 +360,7 @@ _Exported from FigJam Wireframe Widget_`;
               </Rectangle>
               <Text
                 fontSize={9}
-                fontWeight={600}
+                fontWeight={700}
                 fontFamily="Roboto Mono"
                 fill="#333333"
               >
@@ -375,7 +375,7 @@ _Exported from FigJam Wireframe Widget_`;
       <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
         <Text
           fontSize={13}
-          fontWeight={600}
+          fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
         >
@@ -408,7 +408,7 @@ _Exported from FigJam Wireframe Widget_`;
       <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
         <Text
           fontSize={13}
-          fontWeight={600}
+          fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
         >
@@ -558,7 +558,7 @@ _Exported from FigJam Wireframe Widget_`;
         <Text
           fontSize={13}
           fontFamily="Roboto Mono"
-          fontWeight={600}
+          fontWeight={700}
           fill={"#666666"}
         >
           ADD ROW
@@ -574,7 +574,7 @@ _Exported from FigJam Wireframe Widget_`;
       >
         <Text
           fontSize={13}
-          fontWeight={600}
+          fontWeight={700}
           fontFamily="Roboto Mono"
           fill="#333333"
         >
