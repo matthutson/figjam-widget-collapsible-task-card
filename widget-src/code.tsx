@@ -217,6 +217,8 @@ function CollapsibleTaskCard() {
         <AutoLayout
           padding={8}
           fill="#F5F5F5"
+          stroke="#333333"
+          strokeWidth={1.5}
           cornerRadius={6}
           hoverStyle={{ fill: "#E8E8E8" }}
           onClick={duplicateWidget}
@@ -299,7 +301,9 @@ function CollapsibleTaskCard() {
           fontFamily="Roboto Mono"
           onTextEditEnd={(e) => setLastUpdated(e.characters)}
           inputFrameProps={{
-            fill: "#F5F5F5",
+            fill: "#FFFFFF",
+            stroke: "#333333",
+            strokeWidth: 1.5,
             padding: { horizontal: 6, vertical: 3 },
             cornerRadius: 3,
           }}
