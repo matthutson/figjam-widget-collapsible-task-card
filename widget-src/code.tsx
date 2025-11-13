@@ -199,7 +199,6 @@ function CollapsibleTaskCard() {
         <AutoLayout
           direction="horizontal"
           width={"fill-parent"}
-          horizontalAlignItems="space-between"
         >
           {[
             { text: "BRIEFED", state: briefed, setState: setBriefed },
@@ -209,6 +208,8 @@ function CollapsibleTaskCard() {
           ].map((status, index) => (
             <AutoLayout
               key={status.text}
+              width={"fill-parent"}
+              horizontalAlignItems="center"
               onClick={() => {
                 // Set this stage and all previous stages to true
                 setBriefed(index >= 0);
