@@ -165,12 +165,8 @@ function CollapsibleTaskCard() {
         >
           <SVG
             src={collapsed
-              ? `<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 8L10 11L13 8" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>`
-              : `<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 12L10 9L13 12" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>`
+              ? `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12L15 17L20 12" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              : `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 18L15 13L20 18" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
             }
           />
         </AutoLayout>
@@ -211,7 +207,7 @@ function CollapsibleTaskCard() {
               horizontalAlignItems="center"
             >
               <Text
-                fontSize={9}
+                fontSize={10}
                 fontWeight={700}
                 fontFamily="Montserrat"
                 fill="#333333"
@@ -219,8 +215,8 @@ function CollapsibleTaskCard() {
                 {status.text}
               </Text>
               <Rectangle
-                width={20}
-                height={20}
+                width={28}
+                height={28}
                 effect={toggleButtonShadow}
                 onClick={() => {
                   status.setState(!status.state);
@@ -228,7 +224,7 @@ function CollapsibleTaskCard() {
                 fill={status.state ? status.color : "#ffffff"}
                 stroke={status.state ? "#333333" : "#CCCCCC"}
                 strokeWidth={status.state ? 2 : 1}
-                cornerRadius={6}
+                cornerRadius={8}
                 tooltip={status.state ? `Unmark as ${status.text}` : `Mark as ${status.text}`}
               />
             </AutoLayout>
@@ -239,7 +235,7 @@ function CollapsibleTaskCard() {
       {/* Page Title - Main Field */}
       <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
         <Text
-          fontSize={11}
+          fontSize={13}
           fontWeight={600}
           fontFamily="Montserrat"
           fill="#333333"
@@ -271,7 +267,7 @@ function CollapsibleTaskCard() {
       {/* URL Field */}
       <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
         <Text
-          fontSize={11}
+          fontSize={13}
           fontWeight={600}
           fontFamily="Montserrat"
           fill="#333333"
@@ -312,7 +308,7 @@ function CollapsibleTaskCard() {
         >
           <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
             <Text
-              fontSize={11}
+              fontSize={13}
               fontWeight={600}
               fontFamily="Montserrat"
               fill="#333333"
@@ -340,7 +336,7 @@ function CollapsibleTaskCard() {
           </AutoLayout>
           <AutoLayout direction="vertical" width={"fill-parent"} spacing={6}>
             <Text
-              fontSize={11}
+              fontSize={13}
               fontWeight={600}
               fontFamily="Montserrat"
               fill="#333333"
@@ -427,10 +423,7 @@ function CollapsibleTaskCard() {
                 {/* Delete button */}
                 <AutoLayout padding={4}>
                   <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M12 4L4 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M4 4L12 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>`}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4L4 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4L12 12" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                     opacity={0}
                     hoverStyle={{ opacity: 1 }}
                     onClick={() => deleteRow(rowKey)}
