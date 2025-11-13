@@ -13,22 +13,9 @@ const {
 
 const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3"];
 
-const initialRows: { rowKey: string; headerText: string; bodyText?: string }[] =
-  [
-    { rowKey: "date", headerText: "기간" },
-    {
-      rowKey: "hypothesis",
-      headerText: "가설",
-      bodyText: "실험 카드가 아니라면 삭제",
-    },
-    {
-      rowKey: "indicator",
-      headerText: "지표",
-      bodyText: "실험 카드가 아니라면 삭제",
-    },
-    { rowKey: "status", headerText: "현재 상태" },
-    { rowKey: "problem", headerText: "발생한 문제" },
-  ];
+const initialRows: { rowKey: string; text: string; color?: string }[] = [
+  { rowKey: "row1", text: "", color: colors[0] },
+];
 
 function CollapsibleTaskCard() {
   const [initialized, setInitialized] = useSyncedState<boolean>(
@@ -36,17 +23,20 @@ function CollapsibleTaskCard() {
     false
   );
   const [collapsed, setCollapsed] = useSyncedState("collapsed", false);
-  const [author, setAuthor] = useSyncedState("author", "");
-  const [manager, setManager] = useSyncedState("manager", "");
+  const [pageTitle, setPageTitle] = useSyncedState("pageTitle", "");
+  const [url, setUrl] = useSyncedState("url", "");
+  const [linkedFrom, setLinkedFrom] = useSyncedState("linkedFrom", "");
+  const [linkedTo, setLinkedTo] = useSyncedState("linkedTo", "");
   const [mainContentText, setMainContentText] = useSyncedState(
     "mainContentText",
     ""
   );
-  const [onProgress, setOnProgress] = useSyncedState<boolean>(
-    "onProgress",
+  const [briefed, setBriefed] = useSyncedState<boolean>(
+    "briefed",
     false
   );
-  const [trouble, setTrouble] = useSyncedState<boolean>("trouble", false);
+  const [designed, setDesigned] = useSyncedState<boolean>("designed", false);
+  const [built, setBuilt] = useSyncedState<boolean>("built", false);
   const [done, setDone] = useSyncedState<boolean>("done", false);
   const [rowKeys, setRowKeys] = useSyncedState<string[]>(
     "rowsNum",
@@ -54,9 +44,7 @@ function CollapsibleTaskCard() {
   );
   const [color, setColor] = useSyncedState("color", colors[2]);
   const rows = useSyncedMap<string>("rows");
-
-  const getRowHeaderKey = (rowKey: string) => `${rowKey}-header`;
-  const getRowBodyKey = (rowKey: string) => `${rowKey}-body`;
+  const rowColors = useSyncedMap<string>("rowColors");
 
   /** 행 추가 */
   const addRow = () => {
@@ -68,14 +56,16 @@ function CollapsibleTaskCard() {
       addRow();
     } else {
       setRowKeys([...rowKeys, newKey]);
+      // Set default color for new row
+      rowColors.set(newKey, colors[0]);
     }
   };
 
   /** 행 삭제 */
   const deleteRow = (rowKey: string) => {
     setRowKeys(rowKeys.filter((key) => key !== rowKey));
-    rows.delete(getRowHeaderKey(rowKey));
-    rows.delete(getRowBodyKey(rowKey));
+    rows.delete(rowKey);
+    rowColors.delete(rowKey);
   };
 
   /** 위젯이 처음 생성되면 기본 테이블 행을 설정합니다. */
@@ -83,10 +73,8 @@ function CollapsibleTaskCard() {
     if (initialized) return;
     setInitialized(true);
     initialRows.forEach((initialRow) => {
-      rows.set(getRowHeaderKey(initialRow.rowKey), initialRow.headerText);
-      if (initialRow.bodyText) {
-        rows.set(getRowBodyKey(initialRow.rowKey), initialRow.bodyText);
-      }
+      rows.set(initialRow.rowKey, initialRow.text || "");
+      rowColors.set(initialRow.rowKey, initialRow.color || colors[0]);
     });
   });
 
@@ -168,18 +156,24 @@ function CollapsibleTaskCard() {
         >
           {[
             {
-              text: "진행",
-              state: onProgress,
-              setState: setOnProgress,
-              color: "#ffff00",
+              text: "briefed",
+              state: briefed,
+              setState: setBriefed,
+              color: "#BDE3FF",
             },
             {
-              text: "이슈",
-              state: trouble,
-              setState: setTrouble,
-              color: "#ff0000",
+              text: "designed",
+              state: designed,
+              setState: setDesigned,
+              color: "#FFA198",
             },
-            { text: "완료", state: done, setState: setDone, color: "#00ff00" },
+            {
+              text: "built",
+              state: built,
+              setState: setBuilt,
+              color: "#FFE8A3",
+            },
+            { text: "done", state: done, setState: setDone, color: "#AFF4C6" },
           ].map((status) => (
             <AutoLayout
               direction="vertical"
@@ -203,17 +197,17 @@ function CollapsibleTaskCard() {
       </AutoLayout>
 
       <AutoLayout
-        direction="horizontal"
+        direction="vertical"
         width={"fill-parent"}
-        height={"hug-contents"}
+        spacing={8}
       >
         <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
-          <Text fontSize={12}>{" 작성자 / 일시"}</Text>
+          <Text fontSize={12}>Page Title:</Text>
           <Input
             fontSize={14}
-            value={author}
+            value={pageTitle}
             onTextEditEnd={(e) => {
-              setAuthor(e.characters);
+              setPageTitle(e.characters);
             }}
             inputFrameProps={{
               fill: "#FFFFFF",
@@ -225,12 +219,12 @@ function CollapsibleTaskCard() {
           />
         </AutoLayout>
         <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
-          <Text fontSize={12}>{" 담당자"}</Text>
+          <Text fontSize={12}>URL:</Text>
           <Input
             fontSize={14}
-            value={manager}
+            value={url}
             onTextEditEnd={(e) => {
-              setManager(e.characters);
+              setUrl(e.characters);
             }}
             inputFrameProps={{
               fill: "#FFFFFF",
@@ -273,11 +267,49 @@ function CollapsibleTaskCard() {
         cornerRadius={8}
         overflow="hidden"
       >
+        {/* Linked From / Linked To fields */}
+        <AutoLayout
+          direction="horizontal"
+          width={"fill-parent"}
+          spacing={1}
+        >
+          <AutoLayout direction="vertical" width={"fill-parent"} spacing={4} fill="#FFFFFF" padding={12}>
+            <Text fontSize={12} fontWeight={600}>Linked From:</Text>
+            <Input
+              fontSize={14}
+              value={linkedFrom}
+              onTextEditEnd={(e) => {
+                setLinkedFrom(e.characters);
+              }}
+              inputBehavior="multiline"
+              width={"fill-parent"}
+              inputFrameProps={{
+                fill: "#FFFFFF",
+                padding: { horizontal: 8, vertical: 4 },
+              }}
+            />
+          </AutoLayout>
+          <AutoLayout direction="vertical" width={"fill-parent"} spacing={4} fill="#FFFFFF" padding={12}>
+            <Text fontSize={12} fontWeight={600}>Linked To:</Text>
+            <Input
+              fontSize={14}
+              value={linkedTo}
+              onTextEditEnd={(e) => {
+                setLinkedTo(e.characters);
+              }}
+              inputBehavior="multiline"
+              width={"fill-parent"}
+              inputFrameProps={{
+                fill: "#FFFFFF",
+                padding: { horizontal: 8, vertical: 4 },
+              }}
+            />
+          </AutoLayout>
+        </AutoLayout>
+
         {rowKeys.map((rowKey) => {
-          const headerKey = getRowHeaderKey(rowKey);
-          const bodyKey = getRowBodyKey(rowKey);
-          const rowHeaderContent = rows.get(headerKey) ?? "";
-          const rowBodyContent = rows.get(bodyKey) ?? "";
+          const rowContent = rows.get(rowKey) ?? "";
+          const rowColor = rowColors.get(rowKey) ?? colors[0];
           return (
             <AutoLayout
               key={rowKey}
@@ -285,54 +317,52 @@ function CollapsibleTaskCard() {
               width={"fill-parent"}
               verticalAlignItems="center"
               spacing={1}
-              strokeWidth={1}
             >
-              {/* 행 헤더 */}
+              {/* Color picker button */}
               <AutoLayout
-                height={"fill-parent"}
-                fill="#FFFFFF"
+                direction="vertical"
+                spacing={4}
+                padding={8}
+                fill={rowColor}
                 verticalAlignItems="center"
                 horizontalAlignItems="center"
               >
-                <Input
-                  value={rowHeaderContent}
-                  onTextEditEnd={(e) => rows.set(headerKey, e.characters)}
-                  fontWeight={600}
-                  inputBehavior="multiline"
-                  horizontalAlignText="center"
-                  width={150}
-                  height={"hug-contents"}
-                  inputFrameProps={{
-                    fill: "#FFFFFF",
-                    padding: { horizontal: 16, vertical: 24 },
-                  }}
-                />
+                {colors.map((colorOption) => (
+                  <Rectangle
+                    key={colorOption}
+                    width={24}
+                    height={24}
+                    fill={colorOption}
+                    cornerRadius={4}
+                    stroke={rowColor === colorOption ? "#333333" : "#CCCCCC"}
+                    strokeWidth={rowColor === colorOption ? 2 : 1}
+                    onClick={() => rowColors.set(rowKey, colorOption)}
+                    hoverStyle={{ opacity: 0.8 }}
+                  />
+                ))}
               </AutoLayout>
 
-              {/* 행 내용 */}
+              {/* Row content */}
               <AutoLayout
                 width={"fill-parent"}
-                height={"fill-parent"}
-                fill="#FFFFFF"
+                fill={rowColor}
                 verticalAlignItems="center"
-                horizontalAlignItems="center"
               >
                 <Input
-                  value={rowBodyContent}
-                  onTextEditEnd={(e) => rows.set(bodyKey, e.characters)}
+                  value={rowContent}
+                  onTextEditEnd={(e) => rows.set(rowKey, e.characters)}
                   inputBehavior="multiline"
                   width={"fill-parent"}
                   height={"hug-contents"}
                   inputFrameProps={{
-                    fill: "#FFFFFF",
-                    padding: { horizontal: 16, vertical: 24, right: 0 },
+                    fill: rowColor,
+                    padding: { horizontal: 16, vertical: 12, right: 0 },
                   }}
                 />
-                {/* 행 삭제 버튼 */}
+                {/* Delete button */}
                 <AutoLayout
-                  height={"fill-parent"}
-                  fill={"#FFFFFF"}
-                  padding={{ top: 12, right: 8 }}
+                  padding={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                  fill={rowColor}
                 >
                   <SVG
                     src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
