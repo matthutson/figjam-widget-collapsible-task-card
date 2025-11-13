@@ -87,7 +87,7 @@ function CollapsibleTaskCard() {
 
   // Duplicate widget
   const duplicateWidget = () => {
-    figma.widget.clone();
+    figma.notify("To duplicate: Hold Option/Alt and drag the widget");
   };
 
   // Calculate progress percentage
@@ -344,22 +344,22 @@ _Exported from FigJam Wireframe Widget_`;
               onClick={() => status.setState(!status.state)}
               hoverStyle={{ opacity: 0.7 }}
             >
-              <Rectangle
+              <AutoLayout
                 width={20}
                 height={20}
                 fill={status.state ? "#4CAF50" : "#FFFFFF"}
                 stroke="#CCCCCC"
                 strokeWidth={1}
                 cornerRadius={4}
+                horizontalAlignItems="center"
+                verticalAlignItems="center"
               >
                 {status.state && (
                   <SVG
                     src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 10L8 13L15 6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    x={0}
-                    y={0}
                   />
                 )}
-              </Rectangle>
+              </AutoLayout>
               <Text
                 fontSize={9}
                 fontWeight={700}
@@ -401,7 +401,6 @@ _Exported from FigJam Wireframe Widget_`;
             strokeWidth: 1.5,
             padding: { horizontal: 16, vertical: 16 },
             cornerRadius: 10,
-            width: "fill-parent",
           }}
         />
       </AutoLayout>
@@ -431,7 +430,6 @@ _Exported from FigJam Wireframe Widget_`;
             strokeWidth: 1,
             padding: { horizontal: 14, vertical: 10 },
             cornerRadius: 8,
-            width: "fill-parent",
           }}
         />
       </AutoLayout>
@@ -481,23 +479,24 @@ _Exported from FigJam Wireframe Widget_`;
                     src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 15L10 5M10 5L6 9M10 5L14 9" stroke="${isFirst ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                     opacity={isFirst ? 0.4 : 1}
                     hoverStyle={{ opacity: isFirst ? 0.4 : 1 }}
-                    onClick={() => !isFirst && moveRowUp(rowKey)}
+                    onClick={() => { if (!isFirst) moveRowUp(rowKey); }}
                     tooltip={isFirst ? "" : "Move up"}
                   />
                   <SVG
                     src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 5L10 15M10 15L14 11M10 15L6 11" stroke="${isLast ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
                     opacity={isLast ? 0.4 : 1}
                     hoverStyle={{ opacity: isLast ? 0.4 : 1 }}
-                    onClick={() => !isLast && moveRowDown(rowKey)}
+                    onClick={() => { if (!isLast) moveRowDown(rowKey); }}
                     tooltip={isLast ? "" : "Move down"}
                   />
                 </AutoLayout>
 
-                {/* Row content with delete button overlay */}
+                {/* Row content with delete button */}
                 <AutoLayout
                   width={"fill-parent"}
+                  direction="horizontal"
                   verticalAlignItems="center"
-                  positioning="relative"
+                  spacing={6}
                 >
                   <Input
                     value={rowContent}
@@ -513,15 +512,12 @@ _Exported from FigJam Wireframe Widget_`;
                       strokeWidth: isSelected ? 2 : 1,
                       padding: { horizontal: 14, vertical: 10 },
                       cornerRadius: 8,
-                      width: "fill-parent",
                       height: rowContent ? "hug-contents" : 60,
                     }}
                   />
-                  {/* Delete button positioned at top-right corner */}
+                  {/* Delete button */}
                   <AutoLayout
-                    positioning="absolute"
-                    x={{ type: "end", offset: 8 }}
-                    y={{ type: "start", offset: 8 }}
+                    padding={4}
                   >
                     <SVG
                       src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" fill="#FF4444" opacity="0"/><path d="M12 6L6 12M6 6L12 12" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
@@ -597,7 +593,6 @@ _Exported from FigJam Wireframe Widget_`;
             strokeWidth: 1,
             padding: { horizontal: 14, vertical: 10 },
             cornerRadius: 8,
-            width: "fill-parent",
           }}
         />
       </AutoLayout>
