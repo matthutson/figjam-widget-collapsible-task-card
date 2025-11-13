@@ -34,6 +34,7 @@ function CollapsibleTaskCard() {
   const [designed, setDesigned] = useSyncedState<boolean>("designed", false);
   const [built, setBuilt] = useSyncedState<boolean>("built", false);
   const [done, setDone] = useSyncedState<boolean>("done", false);
+  const [lastUpdated, setLastUpdated] = useSyncedState<string>("lastUpdated", new Date().toLocaleDateString());
   const [rowKeys, setRowKeys] = useSyncedState<string[]>(
     "rowsNum",
     initialRows.map((header) => header.rowKey)
@@ -82,6 +83,58 @@ function CollapsibleTaskCard() {
       [newKeys[index], newKeys[index + 1]] = [newKeys[index + 1], newKeys[index]];
       setRowKeys(newKeys);
     }
+  };
+
+  // Duplicate widget
+  const duplicateWidget = () => {
+    figma.widget.clone();
+  };
+
+  // Calculate progress percentage
+  const getProgressPercentage = (): number => {
+    let progress = 0;
+    if (briefed) progress += 25;
+    if (designed) progress += 25;
+    if (built) progress += 25;
+    if (done) progress += 25;
+    return progress;
+  };
+
+  // Update last modified date
+  const updateLastModified = () => {
+    setLastUpdated(new Date().toLocaleDateString());
+  };
+
+  // Export to Jira
+  const exportToJira = async () => {
+    // Collect all row content
+    const contentRows = rowKeys.map(key => rows.get(key) || "").filter(content => content.trim() !== "");
+
+    // Format as Jira markdown
+    const jiraMarkdown = `h2. ${pageTitle || "Untitled Page"}
+
+*URL:* ${url || "N/A"}
+*Cart ID:* ${cartId || "N/A"}
+*Last Updated:* ${lastUpdated}
+*Progress:* ${getProgressPercentage()}%
+
+h3. Status
+${briefed ? "✅" : "⬜"} Briefed
+${designed ? "✅" : "⬜"} Designed
+${built ? "✅" : "⬜"} Built
+${done ? "✅" : "⬜"} Done
+
+h3. Content Wireframe
+${contentRows.length > 0 ? contentRows.map((content, i) => `${i + 1}. ${content}`).join("\n") : "_No content rows added yet_"}
+
+----
+_Exported from FigJam Wireframe Widget_`;
+
+    console.log("=== JIRA EXPORT ===");
+    console.log(jiraMarkdown);
+    console.log("===================");
+
+    figma.notify("📋 Jira export generated! Check browser console (F12) and copy the formatted text.", { timeout: 4000 });
   };
 
   // Initialize widget with default rows
@@ -192,62 +245,127 @@ function CollapsibleTaskCard() {
           />
         </AutoLayout>
 
+        {/* Duplicate Button */}
+        <AutoLayout
+          padding={8}
+          fill="#F5F5F5"
+          cornerRadius={6}
+          hoverStyle={{ fill: "#E8E8E8" }}
+          onClick={duplicateWidget}
+          tooltip="Duplicate this card"
+        >
+          <SVG
+            src={`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="13" height="13" rx="2" stroke="#333333" stroke-width="2"/><path d="M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5" stroke="#333333" stroke-width="2"/></svg>`}
+          />
+        </AutoLayout>
+
+        {/* Export to Jira Button */}
+        <AutoLayout
+          padding={8}
+          fill="#0052CC"
+          cornerRadius={6}
+          hoverStyle={{ fill: "#0065FF" }}
+          onClick={exportToJira}
+          tooltip="Export to Jira"
+        >
+          <SVG
+            src={`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 12L12 22L22 12L12 2Z" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/><path d="M12 8V16M8 12H16" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/></svg>`}
+          />
+        </AutoLayout>
+
         <AutoLayout width={"fill-parent"} />
 
-        {/* Status Buttons */}
+        {/* Last Updated */}
+        <Text
+          fontSize={10}
+          fontFamily="Roboto Mono"
+          fill="#666666"
+        >
+          {lastUpdated}
+        </Text>
+      </AutoLayout>
+
+      {/* Progress Bar */}
+      <AutoLayout
+        direction="vertical"
+        width={"fill-parent"}
+        spacing={8}
+      >
+        {/* Progress Bar Visual */}
+        <AutoLayout
+          width={"fill-parent"}
+          height={8}
+          fill="#E8E8E8"
+          cornerRadius={4}
+          overflow="hidden"
+        >
+          <AutoLayout
+            width={`${getProgressPercentage()}%`}
+            height={8}
+            fill="#4CAF50"
+          />
+        </AutoLayout>
+
+        {/* Progress Checkboxes */}
         <AutoLayout
           direction="horizontal"
-          spacing={12}
-          padding={{ right: 4 }}
+          width={"fill-parent"}
+          spacing={8}
         >
           {[
             {
               text: "BRIEFED",
               state: briefed,
-              setState: setBriefed,
-              color: "#BDE3FF",
+              setState: (val: boolean) => { setBriefed(val); updateLastModified(); },
             },
             {
               text: "DESIGNED",
               state: designed,
-              setState: setDesigned,
-              color: "#FFA198",
+              setState: (val: boolean) => { setDesigned(val); updateLastModified(); },
             },
             {
               text: "BUILT",
               state: built,
-              setState: setBuilt,
-              color: "#FFE8A3",
+              setState: (val: boolean) => { setBuilt(val); updateLastModified(); },
             },
-            { text: "DONE", state: done, setState: setDone, color: "#AFF4C6" },
+            {
+              text: "DONE",
+              state: done,
+              setState: (val: boolean) => { setDone(val); updateLastModified(); },
+            },
           ].map((status) => (
             <AutoLayout
               key={status.text}
-              direction="vertical"
+              direction="horizontal"
               spacing={6}
-              horizontalAlignItems="center"
+              verticalAlignItems="center"
+              onClick={() => status.setState(!status.state)}
+              hoverStyle={{ opacity: 0.7 }}
             >
+              <Rectangle
+                width={20}
+                height={20}
+                fill={status.state ? "#4CAF50" : "#FFFFFF"}
+                stroke="#CCCCCC"
+                strokeWidth={1}
+                cornerRadius={4}
+              >
+                {status.state && (
+                  <SVG
+                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 10L8 13L15 6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    x={0}
+                    y={0}
+                  />
+                )}
+              </Rectangle>
               <Text
-                fontSize={10}
-                fontWeight={700}
+                fontSize={9}
+                fontWeight={600}
                 fontFamily="Roboto Mono"
                 fill="#333333"
               >
                 {status.text}
               </Text>
-              <Rectangle
-                width={28}
-                height={28}
-                effect={toggleButtonShadow}
-                onClick={() => {
-                  status.setState(!status.state);
-                }}
-                fill={status.state ? status.color : "#ffffff"}
-                stroke={status.state ? "#333333" : "#CCCCCC"}
-                strokeWidth={status.state ? 2 : 1}
-                cornerRadius={8}
-                tooltip={status.state ? `Unmark as ${status.text}` : `Mark as ${status.text}`}
-              />
             </AutoLayout>
           ))}
         </AutoLayout>
