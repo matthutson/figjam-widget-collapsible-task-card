@@ -470,22 +470,22 @@ _Exported from FigJam Wireframe Widget_`;
                   direction="vertical"
                   spacing={4}
                   padding={6}
-                  fill="#F0F0F0"
+                  fill="#333333"
                   cornerRadius={6}
-                  stroke={isSelected ? "#333333" : "#CCCCCC"}
-                  strokeWidth={1}
+                  stroke={isSelected ? "#000000" : "#666666"}
+                  strokeWidth={2}
                 >
                   <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12L8 4M8 4L5 7M8 4L11 7" stroke="${isFirst ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    opacity={isFirst ? 0.3 : 1}
-                    hoverStyle={{ opacity: isFirst ? 0.3 : 1 }}
+                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 15L10 5M10 5L6 9M10 5L14 9" stroke="${isFirst ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isFirst ? 0.4 : 1}
+                    hoverStyle={{ opacity: isFirst ? 0.4 : 1 }}
                     onClick={() => !isFirst && moveRowUp(rowKey)}
                     tooltip={isFirst ? "" : "Move up"}
                   />
                   <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4L8 12M8 12L11 9M8 12L5 9" stroke="${isLast ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                    opacity={isLast ? 0.3 : 1}
-                    hoverStyle={{ opacity: isLast ? 0.3 : 1 }}
+                    src={`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 5L10 15M10 15L14 11M10 15L6 11" stroke="${isLast ? '#999999' : '#FFFFFF'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isLast ? 0.4 : 1}
+                    hoverStyle={{ opacity: isLast ? 0.4 : 1 }}
                     onClick={() => !isLast && moveRowDown(rowKey)}
                     tooltip={isLast ? "" : "Move down"}
                   />
@@ -509,7 +509,7 @@ _Exported from FigJam Wireframe Widget_`;
                       fill: rowColor,
                       stroke: isSelected ? "#333333" : "#CCCCCC",
                       strokeWidth: isSelected ? 2 : 1,
-                      padding: { horizontal: 14, vertical: 10, right: 40 },
+                      padding: { horizontal: 14, vertical: 10 },
                       cornerRadius: 8,
                       width: "fill-parent",
                       height: rowContent ? "hug-contents" : 60,
