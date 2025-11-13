@@ -201,6 +201,10 @@ function CollapsibleTaskCard() {
         {/* Collapse/Expand Arrow */}
         <AutoLayout
           padding={8}
+          fill="#F5F5F5"
+          stroke="#333333"
+          strokeWidth={1.5}
+          cornerRadius={6}
           onClick={() => setCollapsed(!collapsed)}
           hoverStyle={{ opacity: 0.7 }}
           tooltip={collapsed ? "Expand" : "Collapse"}
@@ -364,7 +368,7 @@ function CollapsibleTaskCard() {
           inputFrameProps={{
             fill: "#FFFFFF",
             stroke: "#333333",
-            strokeWidth: 1,
+            strokeWidth: 1.5,
             padding: { horizontal: 10, vertical: 8 },
             cornerRadius: 6,
           }}
@@ -410,7 +414,7 @@ function CollapsibleTaskCard() {
                   fill="#E8E8E8"
                   cornerRadius={4}
                   stroke="#CCCCCC"
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                 >
                   <SVG
                     src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12L8 4M8 4L5 7M8 4L11 7" stroke="${isFirst ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
@@ -446,7 +450,7 @@ function CollapsibleTaskCard() {
                     inputFrameProps={{
                       fill: rowColor,
                       stroke: isSelected ? "#333333" : "#CCCCCC",
-                      strokeWidth: isSelected ? 2 : 1,
+                      strokeWidth: 1.5,
                       padding: { horizontal: 10, vertical: 8 },
                       cornerRadius: 6,
                       height: rowContent ? "hug-contents" : 50,
@@ -478,7 +482,7 @@ function CollapsibleTaskCard() {
         height={30}
         fill={"#F5F5F5"}
         stroke="#CCCCCC"
-        strokeWidth={1}
+        strokeWidth={1.5}
         hoverStyle={{ fill: "#E8E8E8" }}
         cornerRadius={6}
         horizontalAlignItems="center"
@@ -527,7 +531,7 @@ function CollapsibleTaskCard() {
           inputFrameProps={{
             fill: "#FFFFFF",
             stroke: "#CCCCCC",
-            strokeWidth: 1,
+            strokeWidth: 1.5,
             padding: { horizontal: 10, vertical: 8 },
             cornerRadius: 6,
           }}
