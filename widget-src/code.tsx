@@ -300,7 +300,7 @@ _Exported from FigJam Wireframe Widget_`;
           overflow="hidden"
         >
           <AutoLayout
-            width={`${getProgressPercentage()}%`}
+            width={(width as number - 32) * (getProgressPercentage() / 100)}
             height={8}
             fill="#4CAF50"
           />
