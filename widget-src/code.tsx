@@ -232,7 +232,7 @@ function CollapsibleTaskCard() {
         {/* Status Checkboxes */}
         <AutoLayout
           direction="horizontal"
-          spacing={8}
+          spacing={4}
         >
           {[
             {
@@ -260,6 +260,8 @@ function CollapsibleTaskCard() {
               key={status.text}
               direction="vertical"
               spacing={3}
+              width={60}
+              horizontalAlignItems="center"
               verticalAlignItems="center"
               onClick={() => status.setState(!status.state)}
               hoverStyle={{ opacity: 0.7 }}
