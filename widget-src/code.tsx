@@ -239,21 +239,25 @@ function CollapsibleTaskCard() {
               text: "BRIEFED",
               state: briefed,
               setState: (val: boolean) => { setBriefed(val); updateLastModified(); },
+              color: "#4A90E2",
             },
             {
               text: "DESIGNED",
               state: designed,
               setState: (val: boolean) => { setDesigned(val); updateLastModified(); },
+              color: "#9B59B6",
             },
             {
               text: "BUILT",
               state: built,
               setState: (val: boolean) => { setBuilt(val); updateLastModified(); },
+              color: "#F39C12",
             },
             {
               text: "DONE",
               state: done,
               setState: (val: boolean) => { setDone(val); updateLastModified(); },
+              color: "#4CAF50",
             },
           ].map((status) => (
             <AutoLayout
@@ -266,25 +270,19 @@ function CollapsibleTaskCard() {
               onClick={() => status.setState(!status.state)}
               hoverStyle={{ opacity: 0.7 }}
             >
-              <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
-                {status.text}
-              </Text>
               <AutoLayout
-                width={18}
-                height={18}
-                fill={status.state ? "#4CAF50" : "#FFFFFF"}
+                width={27}
+                height={27}
+                fill={status.state ? status.color : "#FFFFFF"}
                 stroke="#CCCCCC"
                 strokeWidth={1.5}
                 cornerRadius={3}
                 horizontalAlignItems="center"
                 verticalAlignItems="center"
-              >
-                {status.state && (
-                  <SVG
-                    src={`<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 9L7.5 12L13.5 6" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-                  />
-                )}
-              </AutoLayout>
+              />
+              <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
+                {status.text}
+              </Text>
             </AutoLayout>
           ))}
         </AutoLayout>
