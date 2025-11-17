@@ -13,7 +13,7 @@
   "widgetApi": "1.0.0",
   "networkAccess": {
     "allowedDomains": [
-      "none"
+      "https://*.atlassian.net"
     ]
   }
 }

@@ -11,24 +11,12 @@ const {
   usePropertyMenu,
 } = widget;
 
-const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3"];
+const colors: string[] = ["#FFA198", "#BDE3FF", "#AFF4C6", "#FFE8A3", "#FFFFFF", "#E8E8E8"];
+const colorNames: string[] = ["Coral", "Blue", "Green", "Yellow", "White", "Light Grey"];
 
-const initialRows: { rowKey: string; headerText: string; bodyText?: string }[] =
-  [
-    { rowKey: "date", headerText: "기간" },
-    {
-      rowKey: "hypothesis",
-      headerText: "가설",
-      bodyText: "실험 카드가 아니라면 삭제",
-    },
-    {
-      rowKey: "indicator",
-      headerText: "지표",
-      bodyText: "실험 카드가 아니라면 삭제",
-    },
-    { rowKey: "status", headerText: "현재 상태" },
-    { rowKey: "problem", headerText: "발생한 문제" },
-  ];
+const initialRows: { rowKey: string; text: string; color?: string }[] = [
+  { rowKey: "row1", text: "", color: colors[5] },
+];
 
 function CollapsibleTaskCard() {
   const [initialized, setInitialized] = useSyncedState<boolean>(
@@ -36,29 +24,27 @@ function CollapsibleTaskCard() {
     false
   );
   const [collapsed, setCollapsed] = useSyncedState("collapsed", false);
-  const [author, setAuthor] = useSyncedState("author", "");
-  const [manager, setManager] = useSyncedState("manager", "");
-  const [mainContentText, setMainContentText] = useSyncedState(
-    "mainContentText",
-    ""
-  );
-  const [onProgress, setOnProgress] = useSyncedState<boolean>(
-    "onProgress",
+  const [pageTitle, setPageTitle] = useSyncedState("pageTitle", "");
+  const [url, setUrl] = useSyncedState("url", "");
+  const [cartId, setCartId] = useSyncedState("cartId", "");
+  const [briefed, setBriefed] = useSyncedState<boolean>(
+    "briefed",
     false
   );
-  const [trouble, setTrouble] = useSyncedState<boolean>("trouble", false);
+  const [designed, setDesigned] = useSyncedState<boolean>("designed", false);
+  const [built, setBuilt] = useSyncedState<boolean>("built", false);
   const [done, setDone] = useSyncedState<boolean>("done", false);
+  const [lastUpdated, setLastUpdated] = useSyncedState<string>("lastUpdated", new Date().toLocaleDateString());
   const [rowKeys, setRowKeys] = useSyncedState<string[]>(
     "rowsNum",
     initialRows.map((header) => header.rowKey)
   );
-  const [color, setColor] = useSyncedState("color", colors[2]);
+  const [color, setColor] = useSyncedState("color", colors[4]);
+  const [selectedRowKey, setSelectedRowKey] = useSyncedState<string | null>("selectedRowKey", null);
   const rows = useSyncedMap<string>("rows");
+  const rowColors = useSyncedMap<string>("rowColors");
 
-  const getRowHeaderKey = (rowKey: string) => `${rowKey}-header`;
-  const getRowBodyKey = (rowKey: string) => `${rowKey}-body`;
-
-  /** 행 추가 */
+  // Add new row
   const addRow = () => {
     const newKey = (
       "00000" + Math.floor(Math.random() * 1_000_000).toString()
@@ -68,50 +54,104 @@ function CollapsibleTaskCard() {
       addRow();
     } else {
       setRowKeys([...rowKeys, newKey]);
+      rowColors.set(newKey, colors[5]);
     }
   };
 
-  /** 행 삭제 */
+  // Delete row
   const deleteRow = (rowKey: string) => {
     setRowKeys(rowKeys.filter((key) => key !== rowKey));
-    rows.delete(getRowHeaderKey(rowKey));
-    rows.delete(getRowBodyKey(rowKey));
+    rows.delete(rowKey);
+    rowColors.delete(rowKey);
   };
 
-  /** 위젯이 처음 생성되면 기본 테이블 행을 설정합니다. */
+  // Move row up
+  const moveRowUp = (rowKey: string) => {
+    const index = rowKeys.indexOf(rowKey);
+    if (index > 0) {
+      const newKeys = [...rowKeys];
+      [newKeys[index - 1], newKeys[index]] = [newKeys[index], newKeys[index - 1]];
+      setRowKeys(newKeys);
+    }
+  };
+
+  // Move row down
+  const moveRowDown = (rowKey: string) => {
+    const index = rowKeys.indexOf(rowKey);
+    if (index < rowKeys.length - 1) {
+      const newKeys = [...rowKeys];
+      [newKeys[index], newKeys[index + 1]] = [newKeys[index + 1], newKeys[index]];
+      setRowKeys(newKeys);
+    }
+  };
+
+  // Duplicate widget
+  const duplicateWidget = () => {
+    figma.notify("To duplicate: Hold Option/Alt and drag the widget");
+  };
+
+  // Calculate progress percentage
+  const getProgressPercentage = (): number => {
+    let progress = 0;
+    if (briefed) progress += 25;
+    if (designed) progress += 25;
+    if (built) progress += 25;
+    if (done) progress += 25;
+    return progress;
+  };
+
+  // Update last modified date
+  const updateLastModified = () => {
+    setLastUpdated(new Date().toLocaleDateString());
+  };
+
+  // Initialize widget with default rows
   useEffect(() => {
     if (initialized) return;
     setInitialized(true);
     initialRows.forEach((initialRow) => {
-      rows.set(getRowHeaderKey(initialRow.rowKey), initialRow.headerText);
-      if (initialRow.bodyText) {
-        rows.set(getRowBodyKey(initialRow.rowKey), initialRow.bodyText);
-      }
+      rows.set(initialRow.rowKey, initialRow.text || "");
+      rowColors.set(initialRow.rowKey, initialRow.color || colors[5]);
     });
   });
 
-  /** 위젯 메뉴 설정 */
+  // Widget property menu
   usePropertyMenu(
     [
       {
         itemType: "toggle",
-        tooltip: collapsed ? "펼치기" : "접기",
-        propertyName: "toggle-collpased",
+        tooltip: collapsed ? "Expand" : "Collapse",
+        propertyName: "toggle-collapsed",
         isToggled: false,
       },
       {
         itemType: "color-selector",
-        tooltip: "카드 색상",
+        tooltip: "Card Color",
         propertyName: "color",
-        options: colors.map((color) => ({ tooltip: color, option: color })),
+        options: colors.map((color, index) => ({
+          tooltip: colorNames[index],
+          option: color
+        })),
         selectedOption: color,
+      },
+      {
+        itemType: "color-selector",
+        tooltip: "Row Color (select a row first)",
+        propertyName: "rowColor",
+        options: colors.map((color, index) => ({
+          tooltip: colorNames[index],
+          option: color
+        })),
+        selectedOption: selectedRowKey ? (rowColors.get(selectedRowKey) ?? colors[0]) : colors[0],
       },
     ],
     ({ propertyName, propertyValue }) => {
-      if (propertyName === "toggle-collpased") {
+      if (propertyName === "toggle-collapsed") {
         setCollapsed(!collapsed);
       } else if (propertyName === "color" && propertyValue) {
         setColor(propertyValue);
+      } else if (propertyName === "rowColor" && propertyValue && selectedRowKey) {
+        rowColors.set(selectedRowKey, propertyValue);
       }
     }
   );
@@ -135,238 +175,367 @@ function CollapsibleTaskCard() {
 
   return (
     <AutoLayout
-      name="Widget"
+      name="Collapsible Task Card"
       direction="vertical"
       horizontalAlignItems="center"
       verticalAlignItems="center"
       width={width}
       fill={color}
       spacing={8}
-      padding={8}
-      cornerRadius={12}
+      padding={12}
+      cornerRadius={10}
       overflow="visible"
       effect={shadow}
+      stroke="#333333"
+      strokeWidth={2}
     >
-      {/* 헤더 */}
+      {/* Header */}
       <AutoLayout
         direction="horizontal"
         horizontalAlignItems="center"
+        verticalAlignItems="center"
         width={"fill-parent"}
         height={"hug-contents"}
-        hoverStyle={{ opacity: 0.7 }}
+        spacing={8}
       >
+        {/* Collapse/Expand Arrow */}
         <AutoLayout
-          width={"fill-parent"}
-          height={40}
+          padding={8}
+          fill="#F5F5F5"
+          stroke="#333333"
+          strokeWidth={1.5}
+          cornerRadius={6}
           onClick={() => setCollapsed(!collapsed)}
-        />
+          hoverStyle={{ opacity: 0.7 }}
+          tooltip={collapsed ? "Expand" : "Collapse"}
+        >
+          <SVG
+            src={collapsed
+              ? `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 20L24 28L32 20" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+              : `<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 28L24 20L32 28" stroke="#333333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+            }
+          />
+        </AutoLayout>
 
+        {/* Duplicate Button */}
+        <AutoLayout
+          padding={8}
+          fill="#F5F5F5"
+          stroke="#333333"
+          strokeWidth={1.5}
+          cornerRadius={6}
+          hoverStyle={{ fill: "#E8E8E8" }}
+          onClick={duplicateWidget}
+          tooltip="Duplicate this card"
+        >
+          <SVG
+            src={`<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="14" width="20" height="20" rx="3" stroke="#333333" stroke-width="3"/><path d="M8 22H6C4.89543 22 4 21.1046 4 20V6C4 4.89543 4.89543 4 6 4H20C21.1046 4 22 4.89543 22 6V8" stroke="#333333" stroke-width="3"/></svg>`}
+          />
+        </AutoLayout>
+
+        <AutoLayout width={"fill-parent"} />
+
+        {/* Status Checkboxes */}
         <AutoLayout
           direction="horizontal"
-          spacing={12}
-          padding={{ top: 4, right: 8 }}
+          spacing={4}
         >
           {[
             {
-              text: "진행",
-              state: onProgress,
-              setState: setOnProgress,
-              color: "#ffff00",
+              text: "BRIEFED",
+              state: briefed,
+              setState: (val: boolean) => { setBriefed(val); updateLastModified(); },
+              color: "#4A90E2",
             },
             {
-              text: "이슈",
-              state: trouble,
-              setState: setTrouble,
-              color: "#ff0000",
+              text: "DESIGNED",
+              state: designed,
+              setState: (val: boolean) => { setDesigned(val); updateLastModified(); },
+              color: "#9B59B6",
             },
-            { text: "완료", state: done, setState: setDone, color: "#00ff00" },
+            {
+              text: "BUILT",
+              state: built,
+              setState: (val: boolean) => { setBuilt(val); updateLastModified(); },
+              color: "#F39C12",
+            },
+            {
+              text: "DONE",
+              state: done,
+              setState: (val: boolean) => { setDone(val); updateLastModified(); },
+              color: "#4CAF50",
+            },
           ].map((status) => (
             <AutoLayout
+              key={status.text}
               direction="vertical"
-              spacing={6}
+              spacing={3}
+              width={60}
               horizontalAlignItems="center"
+              verticalAlignItems="center"
+              onClick={() => status.setState(!status.state)}
+              hoverStyle={{ opacity: 0.7 }}
             >
-              <Text fontSize={10}>{status.text}</Text>
-              <Rectangle
-                width={18}
-                height={18}
-                effect={toggleButtonShadow}
-                onClick={() => {
-                  status.setState(!status.state);
-                }}
-                fill={status.state ? status.color : "#ffffff"}
-                cornerRadius={4}
+              <AutoLayout
+                width={27}
+                height={27}
+                fill={status.state ? status.color : "#FFFFFF"}
+                stroke="#333333"
+                strokeWidth={1.5}
+                cornerRadius={3}
+                horizontalAlignItems="center"
+                verticalAlignItems="center"
               />
+              <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
+                {status.text}
+              </Text>
             </AutoLayout>
           ))}
         </AutoLayout>
       </AutoLayout>
 
-      <AutoLayout
-        direction="horizontal"
-        width={"fill-parent"}
-        height={"hug-contents"}
-      >
-        <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
-          <Text fontSize={12}>{" 작성자 / 일시"}</Text>
-          <Input
-            fontSize={14}
-            value={author}
-            onTextEditEnd={(e) => {
-              setAuthor(e.characters);
-            }}
-            inputFrameProps={{
-              fill: "#FFFFFF",
-              stroke: "#cecece",
-              strokeWidth: 1,
-              padding: { horizontal: 12, vertical: 8 },
-              cornerRadius: 6,
-            }}
-          />
-        </AutoLayout>
-        <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
-          <Text fontSize={12}>{" 담당자"}</Text>
-          <Input
-            fontSize={14}
-            value={manager}
-            onTextEditEnd={(e) => {
-              setManager(e.characters);
-            }}
-            inputFrameProps={{
-              fill: "#FFFFFF",
-              stroke: "#cecece",
-              strokeWidth: 1,
-              padding: { horizontal: 12, vertical: 8 },
-              cornerRadius: 6,
-            }}
-          />
-        </AutoLayout>
+      {/* Live Date Field */}
+      <AutoLayout direction="horizontal" width={"fill-parent"} spacing={6} verticalAlignItems="center">
+        <Text fontSize={10} fontFamily="Roboto Mono" fill="#333333" fontWeight={700}>
+          LIVE DATE:
+        </Text>
+        <Input
+          value={lastUpdated}
+          fontSize={10}
+          fontFamily="Roboto Mono"
+          onTextEditEnd={(e) => setLastUpdated(e.characters)}
+          inputFrameProps={{
+            fill: "#FFFFFF",
+            stroke: "#333333",
+            strokeWidth: 1.5,
+            padding: { horizontal: 6, vertical: 3 },
+            cornerRadius: 3,
+          }}
+        />
       </AutoLayout>
 
-      <Input
-        width={"fill-parent"}
-        placeholder="내용"
-        value={mainContentText}
-        fontSize={24}
-        fontWeight={600}
-        lineHeight={32}
-        onTextEditEnd={(e) => setMainContentText(e.characters)}
-        inputBehavior="multiline"
-        inputFrameProps={{
-          fill: "#FFFFFF",
-          stroke: "#cecece",
-          strokeWidth: 1,
-          padding: { horizontal: 16, vertical: 24 },
-          cornerRadius: 12,
-        }}
-      />
+      {/* Page Title - Main Field */}
+      <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
+        <Text
+          fontSize={11}
+          fontWeight={700}
+          fontFamily="Roboto Mono"
+          fill="#333333"
+        >
+          PAGE TITLE
+        </Text>
+        <Input
+          width={"fill-parent"}
+          placeholder="Enter page title..."
+          value={pageTitle}
+          fontSize={24}
+          fontWeight={700}
+          fontFamily="Roboto Mono"
+          lineHeight={30}
+          onTextEditEnd={(e) => {
+            setPageTitle(e.characters);
+          }}
+          inputBehavior="multiline"
+          inputFrameProps={{
+            fill: "#FFFFFF",
+            stroke: "#333333",
+            strokeWidth: 1.5,
+            padding: { horizontal: 12, vertical: 12 },
+            cornerRadius: 8,
+          }}
+        />
+      </AutoLayout>
 
-      {/* 토글 테이블 */}
+      {/* URL Field */}
+      <AutoLayout direction="vertical" width={"fill-parent"} spacing={4}>
+        <Text
+          fontSize={11}
+          fontWeight={700}
+          fontFamily="Roboto Mono"
+          fill="#333333"
+        >
+          URL
+        </Text>
+        <Input
+          width={"fill-parent"}
+          placeholder="https://..."
+          value={url}
+          fontSize={12}
+          fontFamily="Roboto Mono"
+          onTextEditEnd={(e) => {
+            setUrl(e.characters);
+          }}
+          inputFrameProps={{
+            fill: "#FFFFFF",
+            stroke: "#333333",
+            strokeWidth: 1.5,
+            padding: { horizontal: 10, vertical: 8 },
+            cornerRadius: 6,
+          }}
+        />
+      </AutoLayout>
+
+      {/* Collapsible Content */}
       <AutoLayout
         direction="vertical"
         width={"fill-parent"}
-        fill={"#cecece"}
-        verticalAlignItems={"center"}
-        padding={1}
-        spacing={1}
+        spacing={6}
         hidden={collapsed}
-        cornerRadius={8}
-        overflow="hidden"
       >
-        {rowKeys.map((rowKey) => {
-          const headerKey = getRowHeaderKey(rowKey);
-          const bodyKey = getRowBodyKey(rowKey);
-          const rowHeaderContent = rows.get(headerKey) ?? "";
-          const rowBodyContent = rows.get(bodyKey) ?? "";
-          return (
-            <AutoLayout
-              key={rowKey}
-              direction="horizontal"
-              width={"fill-parent"}
-              verticalAlignItems="center"
-              spacing={1}
-              strokeWidth={1}
-            >
-              {/* 행 헤더 */}
-              <AutoLayout
-                height={"fill-parent"}
-                fill="#FFFFFF"
-                verticalAlignItems="center"
-                horizontalAlignItems="center"
-              >
-                <Input
-                  value={rowHeaderContent}
-                  onTextEditEnd={(e) => rows.set(headerKey, e.characters)}
-                  fontWeight={600}
-                  inputBehavior="multiline"
-                  horizontalAlignText="center"
-                  width={150}
-                  height={"hug-contents"}
-                  inputFrameProps={{
-                    fill: "#FFFFFF",
-                    padding: { horizontal: 16, vertical: 24 },
-                  }}
-                />
-              </AutoLayout>
+        {/* Text Rows */}
+        <AutoLayout
+          direction="vertical"
+          width={"fill-parent"}
+          spacing={3}
+        >
 
-              {/* 행 내용 */}
+          {rowKeys.map((rowKey, index) => {
+            const rowContent = rows.get(rowKey) ?? "";
+            const rowColor = rowColors.get(rowKey) ?? colors[0];
+            const isSelected = selectedRowKey === rowKey;
+            const isFirst = index === 0;
+            const isLast = index === rowKeys.length - 1;
+
+            return (
               <AutoLayout
+                key={rowKey}
+                direction="horizontal"
                 width={"fill-parent"}
-                height={"fill-parent"}
-                fill="#FFFFFF"
                 verticalAlignItems="center"
-                horizontalAlignItems="center"
+                spacing={6}
+                onClick={() => setSelectedRowKey(rowKey)}
+                cornerRadius={8}
               >
-                <Input
-                  value={rowBodyContent}
-                  onTextEditEnd={(e) => rows.set(bodyKey, e.characters)}
-                  inputBehavior="multiline"
-                  width={"fill-parent"}
-                  height={"hug-contents"}
-                  inputFrameProps={{
-                    fill: "#FFFFFF",
-                    padding: { horizontal: 16, vertical: 24, right: 0 },
-                  }}
-                />
-                {/* 행 삭제 버튼 */}
+                {/* Reorder controls */}
                 <AutoLayout
-                  height={"fill-parent"}
-                  fill={"#FFFFFF"}
-                  padding={{ top: 12, right: 8 }}
+                  direction="vertical"
+                  spacing={2}
+                  padding={4}
+                  fill="#E8E8E8"
+                  cornerRadius={4}
+                  stroke="#CCCCCC"
+                  strokeWidth={1.5}
                 >
                   <SVG
-                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M12 4L4 12" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M4 4L12 12" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      `}
-                    opacity={0}
-                    hoverStyle={{ opacity: 1 }}
-                    onClick={() => deleteRow(rowKey)}
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 12L8 4M8 4L5 7M8 4L11 7" stroke="${isFirst ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isFirst ? 0.4 : 1}
+                    hoverStyle={{ opacity: isFirst ? 0.4 : 1 }}
+                    onClick={() => { if (!isFirst) moveRowUp(rowKey); }}
+                    tooltip={isFirst ? "" : "Move up"}
+                  />
+                  <SVG
+                    src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4L8 12M8 12L11 9M8 12L5 9" stroke="${isLast ? '#CCCCCC' : '#333333'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                    opacity={isLast ? 0.4 : 1}
+                    hoverStyle={{ opacity: isLast ? 0.4 : 1 }}
+                    onClick={() => { if (!isLast) moveRowDown(rowKey); }}
+                    tooltip={isLast ? "" : "Move down"}
                   />
                 </AutoLayout>
+
+                {/* Row content with delete button */}
+                <AutoLayout
+                  width={"fill-parent"}
+                  direction="horizontal"
+                  verticalAlignItems="center"
+                  spacing={4}
+                >
+                  <Input
+                    value={rowContent}
+                    placeholder=""
+                    onTextEditEnd={(e) => rows.set(rowKey, e.characters)}
+                    inputBehavior="multiline"
+                    width={"fill-parent"}
+                    fontSize={12}
+                    fontFamily="Roboto Mono"
+                    inputFrameProps={{
+                      fill: rowColor,
+                      stroke: isSelected ? "#333333" : "#CCCCCC",
+                      strokeWidth: 1.5,
+                      padding: { horizontal: 10, vertical: 8 },
+                      cornerRadius: 6,
+                      height: rowContent ? "hug-contents" : 50,
+                    }}
+                  />
+                  {/* Delete button */}
+                  <AutoLayout
+                    padding={2}
+                  >
+                    <SVG
+                      src={`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L6 10M6 6L10 10" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+                      opacity={0}
+                      hoverStyle={{ opacity: 1 }}
+                      onClick={() => deleteRow(rowKey)}
+                      tooltip="Delete row"
+                    />
+                  </AutoLayout>
+                </AutoLayout>
               </AutoLayout>
-            </AutoLayout>
-          );
-        })}
+            );
+          })}
+        </AutoLayout>
       </AutoLayout>
 
-      {/* '행 추가' 버튼 */}
+      {/* Add Row Button */}
       <AutoLayout
         hidden={collapsed}
         width={"fill-parent"}
-        height={40}
-        fill={color}
-        opacity={0}
-        hoverStyle={{ fill: "#585858", opacity: 1 }}
-        cornerRadius={20}
+        height={30}
+        fill={"#F5F5F5"}
+        stroke="#CCCCCC"
+        strokeWidth={1.5}
+        hoverStyle={{ fill: "#E8E8E8" }}
+        cornerRadius={6}
         horizontalAlignItems="center"
         verticalAlignItems="center"
+        spacing={4}
         onClick={addRow}
+        tooltip="Add new row"
       >
-        <Text fontSize={12} fill={"#FFFFFF"}>
-          행 추가
+        <Text fontSize={16} fill={"#666666"} fontWeight={400}>
+          +
         </Text>
+        <Text
+          fontSize={11}
+          fontFamily="Roboto Mono"
+          fontWeight={700}
+          fill={"#666666"}
+        >
+          ADD ROW
+        </Text>
+      </AutoLayout>
+
+      {/* Cart ID Field */}
+      <AutoLayout
+        direction="vertical"
+        width={"fill-parent"}
+        spacing={4}
+        hidden={collapsed}
+      >
+        <Text
+          fontSize={11}
+          fontWeight={700}
+          fontFamily="Roboto Mono"
+          fill="#333333"
+        >
+          CART ID (IF RELEVANT)
+        </Text>
+        <Input
+          width={"fill-parent"}
+          placeholder="Optional cart identifier..."
+          value={cartId}
+          fontSize={12}
+          fontFamily="Roboto Mono"
+          onTextEditEnd={(e) => {
+            setCartId(e.characters);
+          }}
+          inputFrameProps={{
+            fill: "#FFFFFF",
+            stroke: "#CCCCCC",
+            strokeWidth: 1.5,
+            padding: { horizontal: 10, vertical: 8 },
+            cornerRadius: 6,
+          }}
+        />
       </AutoLayout>
     </AutoLayout>
   );
